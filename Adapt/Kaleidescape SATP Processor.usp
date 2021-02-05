@@ -1,0 +1,1931 @@
+/*******************************************************************************************
+  SIMPL+ Module Information
+*******************************************************************************************/
+/*
+Programmer: Kaleidescape
+
+ 	(c) 2006 Kaleidescape Inc. This Source Code is the intellectual 
+property of Kaleidescape, Inc. Kaleidescape grants authorized Dealers 
+and Partners the non-exclusive right to modify and/or compile and/or 
+compress the Source Code, and upload such modified and/or compiled 
+and/or compressed Source Code to control systems that control at least 
+one licensed Kaleidescape System. No right is granted to otherwise 
+copy, reproduce, modify, upload, download, transmit, or distribute the 
+Source Code, or derivative works, in any way. The Source Code, and 
+derivative works, are protected by copyright, trade secret, and other 
+intellectual property laws and by international treaties, which 
+provide rights and obligations in addition to the rights and 
+obligations set forth here.
+
+*/
+
+/*******************************************************************************************
+  Compiler Directives
+*******************************************************************************************/
+#HINT "This processor is for use within the Kaleidescape SATP Module." 
+
+#DEFINE_CONSTANT DEBUG 1
+
+//Useful characters that we'll use in the parsing code
+#DEFINE_CONSTANT CR 0x0D		 // Carriage return
+#DEFINE_CONSTANT LF 0x0A		 // Linefeed
+#DEFINE_CONSTANT TAB 0x09		 // Tab
+#DEFINE_CONSTANT BACKSLASH '/'   // /
+#DEFINE_CONSTANT ESCSLASH  '\\'	 // \
+
+#DEFINE_CONSTANT MAX_INT				  65535
+
+#DEFINE_CONSTANT APPEND_TEXT_1	"\xFE\x01"	//Used to append text displayed on a TP, with a newline
+#DEFINE_CONSTANT APPEND_TEXT_2	"\xFE\x02"	//Same as 1, but without a newline
+											//Note these only work on TPS panels and later
+
+#DEFINE_CONSTANT MAX_MESSAGE_LENGTH	2048	// Used to initialize various arrays
+#DEFINE_CONSTANT INPUT_BUFFER_LENGTH 8192	//8K
+#DEFINE_CONSTANT MAX_RESPONSE_ARGS  15//30	// Number or arguments to account for in the player response
+#DEFINE_CONSTANT MAX_RESPONSE_ARG_LEN 80  //Maximum length of a single argument
+#DEFINE_CONSTANT TP_MAX_FIELDS		20
+#DEFINE_CONSTANT MAX_SCROLL_BAR_SIZE 9	// Size is adjusted by using the button mode.  Maximum of 9 modes (0 = no bar)
+#DEFINE_CONSTANT DISPLAY_MAX_LENGTH 80
+#DEFINE_CONSTANT HANDLE_MAX_LENGTH  100
+#DEFINE_CONSTANT MAX_BREADCRUMBS	100
+
+#DEFINE_CONSTANT LIST_MAX_LENGTH  20
+#DEFINE_CONSTANT LIST_NUM_BUTTONS  4
+#DEFINE_CONSTANT LIST_BUTTONS_ARRAY_SIZE 100	//LIST_MAX_LENGTH * (LIST_NUM_BUTTONS + 1)
+
+#DEFINE_CONSTANT ACTION_MAX_LENGTH  100
+
+#DEFINE_CONSTANT DISPLAY_BROWSE		1
+#DEFINE_CONSTANT DISPLAY_NOWPLAYING	2
+
+#DEFINE_CONSTANT BROWSE_START_NODE		"music"
+#DEFINE_CONSTANT NOW_PLAYING_START_NODE	"now_playing"
+
+#DEFINE_CONSTANT BEHAVIOR_BROWSE	1
+#DEFINE_CONSTANT BEHAVIOR_DETAILS	2
+#DEFINE_CONSTANT BEHAVIOR_ACTION	3
+
+#DEFINE_CONSTANT SHOW_BUTTON_OK			4
+#DEFINE_CONSTANT SHOW_BUTTON_BROWSE		1
+#DEFINE_CONSTANT SHOW_BUTTON_PLAY		3
+#DEFINE_CONSTANT SHOW_BUTTON_DETAILS	2
+
+#DEFINE_CONSTANT DETAILS_NOWPLAYING		1
+#DEFINE_CONSTANT DETAILS_NEXTPLAYING	2
+#DEFINE_CONSTANT DETAILS_BROWSING		3
+
+#DEFINE_CONSTANT DETAIL_IS_ALBUM		1
+#DEFINE_CONSTANT DETAIL_IS_TRACK		2
+#DEFINE_CONSTANT DETAIL_IS_ARTIST		3
+#DEFINE_CONSTANT DETAIL_IS_GENRE		4
+
+#DEFINE_CONSTANT BROWSE_AVAILABLE_INDICATOR "  >"
+
+#DEFAULT_VOLATILE
+#ENABLE_STACK_CHECKING
+
+#HELP_BEGIN
+(c) 2006 Kaleidescape Inc.  Please see legal notice below.
+
+This processor is for use within the Kaleidescape Music List Interface.
+
+
+----------------------------------------------------------------------
+
+LEGAL NOTICE
+    (c) 2006 Kaleidescape Inc. This Source Code is the intellectual 
+property of Kaleidescape, Inc. Kaleidescape grants the non-exclusive 
+right to modify and/or compile and/or compress the Source Code, and 
+upload such modified and/or compiled and/or compressed Source Code 
+to control systems that control at least one licensed Kaleidescape 
+System. No right is granted to otherwise copy, reproduce, modify, 
+upload, download, transmit, or distribute the Source Code, or 
+derivative works, in any way. The Source Code, and derivative works, 
+are protected by copyright, trade secret, and other intellectual 
+property laws and by international treaties, which provide rights 
+and obligations in addition to the rights and obligations set forth here.
+
+#HELP_END
+
+
+
+/*******************************************************************************************
+  DIGITAL, ANALOG and SERIAL INPUTS and OUTPUTS
+*******************************************************************************************/
+ANALOG_INPUT Stated_Player_ID;
+ANALOG_INPUT Stream_ID;
+DIGITAL_INPUT Connection_Open;
+ANALOG_INPUT Time_Update_Interval;
+
+BUFFER_INPUT Rx$[INPUT_BUFFER_LENGTH];
+STRING_INPUT Command_To_Player[MAX_MESSAGE_LENGTH];
+STRING_INPUT Keyboard_Input[MAX_MESSAGE_LENGTH];
+
+STRING_INPUT Play_Script[MAX_MESSAGE_LENGTH];
+
+DIGITAL_INPUT Now_Playing_Details;
+DIGITAL_INPUT Next_Playing_Details;
+
+DIGITAL_INPUT Browse_Select;
+DIGITAL_INPUT Now_Playing_Select;
+
+DIGITAL_INPUT List_Begin;
+DIGITAL_INPUT List_Back;
+
+DIGITAL_INPUT List_Up;
+DIGITAL_INPUT List_Down;
+ANALOG_INPUT List_Analog_Scroll_Act;
+
+ANALOG_INPUT List_Window_Length;
+
+DIGITAL_INPUT Details_Cancel;
+
+DIGITAL_INPUT List_Select_Digital[TP_MAX_FIELDS];
+
+STRING_OUTPUT Tx$;
+
+STRING_OUTPUT User_Defined_Event;
+
+ANALOG_OUTPUT Play_Mode;
+ANALOG_OUTPUT Song_Length;
+ANALOG_OUTPUT Song_Position;
+ANALOG_OUTPUT Song_Remaining;
+ANALOG_OUTPUT Song_Level;
+STRING_OUTPUT Song_Name;
+STRING_OUTPUT Album_Name;
+STRING_OUTPUT Artist_Name;
+STRING_OUTPUT Next_Song;
+
+ANALOG_OUTPUT Protocol_Version;
+
+ANALOG_OUTPUT User_Input;
+STRING_OUTPUT User_Input_Prompt;
+STRING_OUTPUT User_Input_Text;
+
+STRING_OUTPUT Friendly_Name;
+
+STRING_OUTPUT Info;
+
+DIGITAL_OUTPUT Browse_Selected;
+DIGITAL_OUTPUT Now_Playing_Selected;
+
+DIGITAL_OUTPUT List_Scroll_Available;
+
+DIGITAL_OUTPUT List_Back_Available;
+
+ANALOG_OUTPUT List_Analog_Scroll_FB;
+ANALOG_OUTPUT List_Analog_Scroll_Size_FB;
+
+DIGITAL_OUTPUT Details_Visible;
+
+DIGITAL_OUTPUT Repeat_Status;
+DIGITAL_OUTPUT Random_Status;
+
+STRING_OUTPUT List_Title;
+STRING_OUTPUT Details_Title;
+
+STRING_OUTPUT Image_URL;
+
+STRING_OUTPUT List_Serial_FB[TP_MAX_FIELDS];
+DIGITAL_OUTPUT List_Select_Digital_FB[TP_MAX_FIELDS];
+ANALOG_OUTPUT List_Status_Analog_FB[TP_MAX_FIELDS];
+
+/*******************************************************************************************
+  Structure Definitions
+  Note:  Be sure to initialize all declared STRING variables as needed
+         For example, in Function Main: struct.myString = "";
+*******************************************************************************************/
+STRUCTURE struct_List_Item
+ {
+// 	string Display[DISPLAY_MAX_LENGTH];
+ 	integer Position;
+ 	integer Queue_Status;
+ 	integer Type;
+ 	string Handle[HANDLE_MAX_LENGTH];
+ 	integer Behavior;
+ 	integer Pop; 	
+ };
+
+STRUCTURE struct_Browse_Breadcrumb
+ {
+ 	string Handle[HANDLE_MAX_LENGTH];
+ 	integer Position;
+ 	integer Selection;
+ };
+
+/*******************************************************************************************
+  Global Variables
+*******************************************************************************************/
+integer Resetting_Interface;
+integer Player_Initialized;
+string Module_Description[100];
+string Player_SN[16];
+string Connected_Device_SN[16];
+integer Player_ID;
+integer Connected_Device_ID;
+
+struct_List_Item List[LIST_MAX_LENGTH];
+
+integer TP_Window_Length;
+
+integer List_Position;
+integer List_Selection;
+integer List_Length;
+integer Last_Item;
+
+integer Display;			//indicates what is being displayed - browse, now playing or details
+
+//string Browse_Node[HANDLE_MAX_LENGTH];
+                     
+struct_Browse_Breadcrumb Crumb[MAX_BREADCRUMBS];                     
+integer Target_Crumb;
+integer First_Crumb;
+integer Crumb_Count;
+
+struct_Browse_Breadcrumb Stored_Crumb[MAX_BREADCRUMBS];
+integer Stored_Target;
+integer Stored_First;
+integer Stored_Count;
+
+string Query_Table[HANDLE_MAX_LENGTH];
+integer First_Detail_Flag;
+
+string Now_Playing_Handle[HANDLE_MAX_LENGTH];
+string Next_Playing_Handle[HANDLE_MAX_LENGTH];
+
+integer Last_Button_Label[LIST_NUM_BUTTONS];
+
+integer Button_Choices_Ref;
+integer Details_Requested;
+//string Details_Handle[HANDLE_MAX_LENGTH];
+integer Detail_Type;
+
+signed_integer Movement_Direction;
+integer Movement_Speed;
+
+integer last_Play_Mode;
+
+integer Get_List_Running_Flag;
+integer Get_List_Pending_Flag;
+
+/*******************************************************************************************
+  Functions
+*******************************************************************************************/
+
+/* Send a command to the output with a given ID.Zone/sequence/command */
+Function Send_Raw(integer d_ID, integer s_ID, integer sequence, string command)	{
+    string data_out[MAX_MESSAGE_LENGTH];
+    
+	if(s_Id <> 0)
+		MakeString(data_out,"%02u.%02u/%01u/%s\n", d_Id, s_Id, sequence, command);
+	else
+		MakeString(data_out,"%02u/%01u/%s\n", d_Id, sequence, command);
+	
+
+	#IF_DEFINED DEBUG
+	print("Sending:  %s",data_out);
+	#ENDIF
+	
+	Tx$ = data_out;
+	
+}
+
+/* Send a command */
+Function Send(string data)  {
+	if(Player_Id = 0)	{
+		if(Stated_Player_Id = 0)	{
+			print("Kaleidescape Player_Id not yet determined, not sending message: %s\n", data);
+			return;
+		}
+		Player_Id = Stated_Player_Id;
+		#IF_DEFINED DEBUG
+		print("\"Send\" setting Player_Id to Stated_Player_Id (%u).\n",Player_Id);
+		#ENDIF
+	}
+	
+	Send_Raw(Player_ID, Stream_ID, 1, data);
+}
+
+/* function to properly escape an arbritrary string */
+String_Function Escape(string s)	{						
+	integer loop;
+	integer character;
+	string r[MAX_MESSAGE_LENGTH];
+	
+	for(loop = 1 to len(s))	{										//step through every character of s
+		character = byte(s,loop);									//extract it
+		cswitch(character)	{										//examine it
+			case (':')		: 
+			case (BACKSLASH): 
+			case (ESCSLASH)	:  
+							  r=r+chr(ESCSLASH);					//escape all of the above
+			default			: r=r+chr(character);					//append the character
+		}
+	}
+	return(r);
+}
+
+/* as Crestron doesn't allow struct copies, this routine does it for us */
+function Copy_Crumb(byref struct_Browse_Breadcrumb a, readonlybyref struct_Browse_Breadcrumb b)	{
+	a.Handle 	= b.Handle;
+	a.Position 	= b.Position;
+	a.Selection = b.Selection;
+}
+
+/* Swap a single crumb for another */
+function Swap_Crumb(byref struct_Browse_Breadcrumb a, byref struct_Browse_Breadcrumb b)	{
+	struct_Browse_Breadcrumb s;
+	
+	Copy_Crumb(s,a);	//save a
+	Copy_Crumb(a,b);	//set a=b
+	Copy_Crumb(b,s);	//restore to b
+}
+	
+/* Change out the entire crumb set */
+function Swap_Crumbs()	{
+	integer loop;
+	integer s_target, s_first, s_count;
+	
+	Crumb[Target_Crumb].Position = List_Position;		//store the position
+	Crumb[Target_Crumb].Selection = List_Selection;		//and selection
+	
+	if(Display = Crumb[0].Position)	{						//if we're already showing the proper crumb set
+		#IF_DEFINED DEBUG
+		print("Crumb[0].Position=Display=%u.  Not swapping crumb sets.\n", Display);
+		#ENDIF
+		
+		return;												//do nothing
+	}
+	#IF_DEFINED DEBUG
+	print("Crumb[0].Position=%u, Display=%u.  Swapping crumb sets.\n",Crumb[0].Position, Display);
+	#ENDIF
+	
+	//Crumb[0].Position
+	for(loop=0 to MAX_BREADCRUMBS)	{
+		Swap_Crumb(Stored_Crumb[loop], Crumb[loop]);		//store the browse crumb
+	}
+	
+	s_target = Target_Crumb;
+	s_first  = First_Crumb;
+	s_count  = Crumb_Count;
+
+	Target_Crumb = Stored_Target;
+	First_Crumb  = Stored_First;
+	Crumb_Count  = Stored_Count;
+	
+	Stored_Target	= s_target;
+	Stored_First	= s_first;
+	Stored_Count	= s_count;
+	
+	List_Position = Crumb[Target_Crumb].Position;		//recall the position
+	List_Selection = Crumb[Target_Crumb].Selection;		//and selection
+}
+
+
+
+/* handle requests for details intelligently */
+Function Get_Details(string handle, integer which_detail)	{
+	string text[MAX_MESSAGE_LENGTH];
+	
+	Details_Requested = which_detail;			//keep track of this to know when to update the details
+	Detail_Type = 0;								//clear the detail type
+	
+	if(len(handle) > 0)	{
+		First_Detail_Flag = on;							//indicate that the next detail is the first
+		text = "GET_CONTENT_DETAILS:"+ handle +"::";
+		Send(text);
+		return;
+	}
+		//if we are here, there is no handle
+	Info = " ";
+	Details_Title = " ";
+	
+}
+
+/* Show back button on list */
+Function Render_Browse_Back()	{
+	List_Back_Available = (Crumb_Count > 1);
+}
+
+                     
+/* General purpose function to remove the right-most character from a string */                     
+String_Function Shave_RChr(string s)
+{
+	return(left(s,len(s)-1));
+}
+
+
+/* Initialize the crumb list */
+Function Set_First_Crumb()	{
+	First_Crumb = 1;
+	Target_Crumb = 1;
+	Crumb_Count = 1;
+	List_Position = 1;
+	List_Selection = 0;	
+	Crumb[1].Handle = Crumb[0].Handle;			//retreive the starting handle (in 0)
+	#IF_DEFINED DEBUG
+	print("First crumb set to %s\n",Crumb[Target_Crumb].Handle);
+	#ENDIF
+}
+
+/* Retrieve the current list */
+Function Get_List()	{
+	string b_cmd[100];
+	integer top_number;
+	
+	#IF_DEFINED DEBUG
+	print("TP_Window_Length=%u\n",TP_Window_Length);
+	#ENDIF
+	
+	if(TP_Window_Length = 0) return;		//do nothing if length is 0
+	
+	if(!Now_Playing_Selected && !Browse_Selected)		//if neither list is selected
+		return;								//do nothing
+
+	if(Crumb_Count = 0) Set_First_Crumb();		//if we have no crumbs, set the first
+
+		//to be a bit more gentle on the processor, we will ensure that
+		//this routine only runs after all previous BROWSE responses
+		//have returned, and collapse multiple pending requests into a 
+		//single request.
+		
+	if(Get_List_Pending_Flag) return;		//if there is already a pending get list, do nothing
+	Get_List_Pending_Flag = on;				//set the flag to prevent re-entering this routine
+	
+	while(Get_List_Running_Flag)	{		//if get list is already running
+		delay(10);							//check again in a moment
+		
+		wait(500, GET_LIST_TIMEOUT)	{		//failsafe - if 5 secs passes and still waiting
+			Get_List_Running_Flag = off;	//assume the last command failed, and run anyway
+		}
+	}
+	cancelwait(GET_LIST_TIMEOUT);
+	Get_List_Running_Flag = on;				//indicate that we are now going to run the command
+	Get_List_Pending_Flag = off;			//clear the pending flag to allow re-entry
+
+	
+	top_number = List_Position + TP_Window_Length - 1;
+	
+	MakeString(b_cmd,"BROWSE:%s::%u-%u::",Crumb[Target_Crumb].Handle,List_Position,top_number);
+	Send(b_cmd);
+	
+}
+ 
+/* run get list only after a slight delay to collapse multiple requests into one */
+Function Gently_Get_List()	{
+	wait(40)	{				//request the list no faster than every 4/10 of a second
+		Get_List();
+	}
+}
+
+/* Retreive the beginning of the list */
+Function Get_Top_List()
+{
+	#IF_DEFINED DEBUG
+	print("Getting top list\n");
+	#ENDIF
+	Set_First_Crumb();
+	Get_List();
+}
+
+
+/* Begin the init process - find out about the device we're supposed to control */    
+Function Send_Initialize()  {
+	
+	Send("GET_DEVICE_INFO:");	
+}
+
+/* Continue the init process - discover info about the connected port */
+Function Send_Initialize2()	{
+	Send_Raw(1,0,2,"GET_DEVICE_INFO:");		//discover the ID and SN of the directly connected device
+}
+
+/* Determine how we should communicate with the device we're supposed to control */
+Function Refactor_Connection_Settings()	{
+		
+	if(Stated_Player_ID = 1)				//if the given player id is 1 (implying a direct connection)
+	{
+		Player_ID = Connected_Device_ID;	//then use the ID of the connected device, no matter what it is
+		if(Player_ID = 0) Player_ID = 1;
+	}
+
+											//this solves problems where the installer direct connects the player
+											//but the player's ID is actually something other than 01.
+	#IF_DEFINED DEBUG
+	print("K module refactored interface.\n");
+	print("          Player SN = %s\n",Player_SN);
+	print("Connected Device SN = %s\n",Connected_Device_SN);
+	print("Stated ID = %u, Connected ID = %u, Player ID = %u.\n\n",Stated_Player_ID, Connected_Device_ID, Player_ID);
+	#ENDIF
+	
+}
+
+/* Get the initial state of the zone */
+Function Startup_Status()	{
+	string command[MAX_MESSAGE_LENGTH];
+
+	Send("GET_PLAY_STATUS:");			//the first command may be garbled with other data.  This is throwaway data.
+
+	makestring(command,"SEND_TO_SYSLOG:INFORMATION:%s:",Escape(Module_Description));
+	Send(command);
+
+		//enable events for this Zone	
+	MakeString(command, "ENABLE_EVENTS:%02u.%02u:", Player_Id, Stream_Id);
+	Send_Raw(1,0,3,command);
+	delay(500);
+	
+		//Retreive current status
+	Send("GET_MUSIC_PLAY_STATUS:");
+	Send("GET_MUSIC_TITLE:");
+	Send("GET_NEXT_MUSIC_TITLE:");
+	Send("GET_FRIENDLY_NAME:");
+			
+	Send("GET_PROTOCOL:");
+	
+		//get the first list
+	Get_Top_List();
+
+}
+
+/* Start the init process - ensure we have comms */
+Function Reset_Interface()  {
+	if(Resetting_Interface = 1) return;		//if already resetting the interface, exit immediately
+	Resetting_Interface = 1;				//set the flag to prevent this function from re-entering
+	
+	
+	Player_ID = Stated_Player_ID;			//assume that the stated player ID is correct
+	
+	Player_Initialized = 0;					//clear the initialized flag
+	Player_SN = "";							//clear the player's sn
+	Connected_Device_SN = "";				//clear the connected device's sn
+	
+    while(len(Player_SN) = 0 | len(Connected_Device_SN) = 0)	{		//Keep trying until we have data 
+    	if(Connection_Open = off) {
+    		Resetting_Interface = 0;
+    		return;								//if the connection closes, stop trying
+    	}
+    	
+		Send_Initialize();    				//send initialization
+		delay(200);							//wait two seconds for received data
+		if(len(Player_SN) > 0)   {			//if we have returned data
+			Send_Initialize2();				//send the next init step (query the local interface)
+			delay(100);						//wait for one second for received data
+			if(len(Connected_Device_SN) > 0)//if we have returned data
+				break;						//break out of our init loop
+		}
+		
+		#IF_DEFINED DEBUG
+		print("Kaleidescape Initialization failed.\nPlayer SN = %s, Connected Device SN = %s\n",Player_SN, Connected_Device_SN);
+		#ENDIF
+		
+	    delay(800);							//wait to try again
+	}
+	
+	Refactor_Connection_Settings();			//verify (or set) how our connection will be used
+	
+	Startup_Status();						//obtain the status for various items
+	
+	Player_Initialized = 1;					//indicate that we are initialized
+	
+	Resetting_Interface = 0;				//clear the flag to allow this function to run again
+	
+}
+
+//       Kaleidescape responses and events have this format:
+//    
+//           01.01/1/000:COMMAND:ARG1:ARG2:ARG3:/28 
+//           
+//       where:
+//       
+//           01 is the device ID 
+//           .01 is an optional stream ID
+//           1 is the sequence number (the same one we sent it in the command)
+//           000 is the status (000 means "success", anything else is an error)
+//           COMMAND identifies the kind of data being sent to us
+//           ARGn are the arguments of the command
+//           28 is the checksum of the message (always two digits)   
+//           
+//       So we will parse the response from the beginning to the end.
+//       Since we may be dealing with a serial connection, we must assume
+//       that this buffer may have been corrupted in transit.  We must be
+//       very careful to check that the syntax of the response is valid.
+//       (This is not really necessary when using TCP/IP since the TCP 
+//       layer ensures this for us.)
+
+/* Function to determine if a given integer is a valid digit */
+Integer_Function isDigit(integer c)	{
+    return ((c >= '0' && c <='9'));
+}
+
+/* Function to determine if a given integer is a valid Hex digit */
+Integer_Function isHex(integer c)	{
+    return((  isDigit(c) || ( c >= 'A' && c <= 'F' )  ));
+}
+
+/* Function to determine if a given integer is a valid sequence number */
+Integer_Function isSequence(integer c)	{
+    return(( isDigit(c) || c = '!' || c = '?' ));
+}
+
+
+/*  Validate that the message is valid
+    used by the Parse_Message function
+    Returns 0 if invalid message, 1 otherwise */
+Integer_Function Valid_Message(string message, integer device_id, integer device_zone_id)  {
+	integer calculated_checksum;
+	integer response_checksum;
+	integer index;
+	integer message_id;
+	integer message_zone_id;
+	
+    // The shortest response is "01/1/000:/xx", so if we have something
+    // shorter than that, then we can just ignore it since we know it's
+    // corrupted.
+    if (len(message) < 12)  {
+    	#IF_DEFINED DEBUG
+        print ("Response too short: %s\n",message);
+        #ENDIF
+        return(0);
+    }
+    
+    // If using sn device ID messages, the message will be longer
+    // #00000000FFFF/1/000:/xx
+    if (byte(message,1) = '#' && len(message) < 22)	{		//shortest len for a sn device ID type message
+    	#IF_DEFINED DEBUG
+        print ("Response too short: %s\n",message);
+        #ENDIF
+        return(0);    	
+    }
+
+    if (byte(message,1) = '#' && byte(message,14) = '.')	{		//device ID with zone
+    	if(!isHex(byte(message,2)) ||
+    	   !isHex(byte(message,3)) ||
+    	   !isHex(byte(message,4)) ||
+    	   !isHex(byte(message,5)) ||
+    	   !isHex(byte(message,6)) ||
+    	   !isHex(byte(message,7)) ||
+    	   !isHex(byte(message,8)) ||
+    	   !isHex(byte(message,9)) ||
+    	   !isHex(byte(message,10)) ||
+    	   !isHex(byte(message,11)) ||
+    	   !isHex(byte(message,12)) ||
+    	   !isHex(byte(message,13)) ||
+    	   !isDigit(byte(message,15)) ||
+    	   !isDigit(byte(message,16)) ||
+    	   byte(message,17) != BACKSLASH ||
+    	   !isSequence(byte(message,18)) ||
+    	   byte(message,19) != BACKSLASH ||
+           byte(message,len(message)-2) != BACKSLASH) {
+           
+    		print("Kaleidescape Player ID %d:  Received garbled message.\n    message is: %s\n",Player_ID, message);
+        	return(0);
+        }
+        message_id = 0;
+        message_zone_id  = atoi(mid(message,15,2));
+        
+        print("Bad Address: %s   My Address: %d\n",left(message,13), device_id);
+    }
+
+    else if (byte(message,1) = '#')	{
+    	if(!isHex(byte(message,2)) ||
+    	   !isHex(byte(message,3)) ||
+    	   !isHex(byte(message,4)) ||
+    	   !isHex(byte(message,5)) ||
+    	   !isHex(byte(message,6)) ||
+    	   !isHex(byte(message,7)) ||
+    	   !isHex(byte(message,8)) ||
+    	   !isHex(byte(message,9)) ||
+    	   !isHex(byte(message,10)) ||
+    	   !isHex(byte(message,11)) ||
+    	   !isHex(byte(message,12)) ||
+    	   !isHex(byte(message,13)) ||
+    	   byte(message,14) != BACKSLASH ||
+    	   !isSequence(byte(message,15)) ||
+    	   byte(message,16) != BACKSLASH ||
+           byte(message,len(message)-2) != BACKSLASH) {
+           
+    		print("Kaleidescape Player ID %d:  Received garbled message.\n    message is: %s\n",Player_ID, message);
+        	return(0);
+        }
+        message_id = 0;
+        message_zone_id = 0;
+        
+        print("Bad Address: %s   My Address: %d\n",left(message,13), device_id);
+        return(0);
+    
+    }
+    
+    else if (byte(message,3) = '.')	{			//contains a zone ID
+    	if(!isDigit(byte(message,1)) ||
+    	   !isDigit(byte(message,2)) ||
+    	   !isDigit(byte(message,4)) ||
+    	   !isDigit(byte(message,5)) ||
+    	   byte(message,6) != BACKSLASH ||
+    	   !isSequence(byte(message,7)) ||
+    	   byte(message,8) != BACKSLASH ||
+           byte(message,len(message)-2) != BACKSLASH) {
+           
+    		print("Kaleidescape Player ID %d:  Received garbled message.\n    message is: %s\n",Player_ID, message);
+        	return(0);     
+        }
+    	
+
+	    message_id = atoi(left(message,2));
+   		message_zone_id  = atoi(mid(message,4,2));
+   }
+    
+    else	{
+    	if(!isDigit(byte(message,1)) ||
+    	   !isDigit(byte(message,2)) ||
+    	   byte(message,3) != BACKSLASH ||
+    	   !isSequence(byte(message,4)) ||
+    	   byte(message,5) != BACKSLASH ||
+           byte(message,len(message)-2) != BACKSLASH) {
+           
+    		print("Kaleidescape Player ID %d:  Received garbled message.\n    message is: %s\n",Player_ID, message);
+        	return(0);     
+        }
+	    message_id = atoi(left(message,2));
+	    message_zone_id  = 0;
+    }		
+          
+    // Check that this response is from the device we want to talk to.
+   	if(message_id != device_id)  {
+    	#IF_DEFINED DEBUG
+    	print("Ignoring Address: %d   (My Address is %d.)\n",message_id, device_id);
+    	#ENDIF
+    	return(0);									//indicate that the message is not OK (not addressed to us)
+    }	
+      
+    if(message_zone_id != device_zone_id)  {
+    	#IF_DEFINED DEBUG
+    	print("Ignoring Zone ID: %d   (My Zone ID is %d)\n",message_zone_id, device_zone_id);
+    	#ENDIF
+    	return(0);
+    }
+    
+      
+    // Calculate the checksum and verify it.
+    calculated_checksum = 0;
+    for(index = 1 to (len(message) -2) )  {  // skip last two characters, that's the checksum itself.
+        calculated_checksum = (calculated_checksum + byte(message,index)) mod 100;
+    }
+    
+    response_checksum = atoi(right(message,2));
+    if (calculated_checksum != response_checksum)  {
+    	#IF_DEFINED DEBUG
+    	print("Bad checksum: %d vs %d\n",calculated_checksum,response_checksum);
+    	#ENDIF
+        return(0);
+    }
+    
+    return(1);   
+}
+	
+/* Remove and return a single field from the message.
+   Used by the Parse_Message function. */
+String_Function Extract_Field(string message)  {
+	integer character;
+	integer escaped;
+	string response[MAX_RESPONSE_ARG_LEN];
+	
+	escaped = 0;		// initialize the variable
+	
+	while (len(message) > 0)  { // step through each byte
+	
+        //get the character being examined
+        character = GetC(message);
+        
+        if (escaped = 1) {
+            // The previous character was a backslash, treat this character specially.
+            switch (character)  {
+                case ('d'):  {
+                    // The following three digits make up the character.
+                    character = (getC(message) - '0') * 100;
+                    character = character + (getC(message) - '0') * 10;
+                    character = character + (getC(message) - '0');
+                }
+                case ('t'):  {
+                    character = TAB;
+                }
+                case ('n'):  {
+                    character = LF;
+                }
+                case ('r'):  {
+                    character = CR;
+                }
+                default:   {
+                    // All other characters are simply themselves, nothing to do here.
+                }
+            }
+
+            // Append character to the response
+            if(len(response) < MAX_RESPONSE_ARG_LEN)
+	            response = response + chr(character);
+
+            // The escape only applies to the next character.  After that we're back to normal.
+            escaped = 0;
+        }
+        else  {	// here if escaped is 0
+            switch (character)  {
+                case (ESCSLASH):  {
+                    // Treat the next character specially.
+                    escaped = 1;
+                }
+                case (':'):  {
+                    // Colons separate fields, so finish this field.
+                    return(response);
+                }
+                default:   {
+                    // Normal character, append it.
+    		        if(len(response) < MAX_RESPONSE_ARG_LEN)
+                   		response = response + chr(character);
+                }                    
+            }		//switch
+        }			//else
+    }				//while
+    #IF_DEFINED DEBUG
+    print("Kaleidescape field contains no terminating colon.\n  Response is: \"%s\"\n", response);
+    #ENDIF
+    return(response);
+}					//function
+   
+
+/* Decode and display the error code & message */   
+Function Player_Error(integer error_code, string details)  {
+	string description[30];
+	
+	switch(error_code)  {
+		case(1):  {
+			description =  "Message too long.";
+		}
+		case(2):  {
+			description =  "Message contains invalid character.";
+		}
+		case(3):  {
+			description =  "Checksum error.";
+		}
+		case(4):  {
+			description =  "Invalid device.";
+		}
+		case(5):  {
+			description =  "Device unavailable.";
+		}
+		case(10):  {
+			description =  "Invalid request.";
+		}
+		case(11):  {
+			description =  "Invalid number of parameters.";
+		}
+		case(12):  {
+			description =  "Invalid parameter.";
+		}
+		case(13):  {
+			description =  "Device identifier conflict.";
+		}
+		case(14):  {
+			description =  "Invalid sequence number.";
+		}
+		case(15):  {
+			description =  "Disallowed due to parental control.";
+		}
+		case(16):  {
+			description =  "Invalid passcode.";
+		}
+		case(17):  {
+			description =  "Invalid content handle.";
+		}
+		case(999):  {
+			description =  "Undetermined error.";
+		}
+		default:  {
+			description =  "Unknown error.";
+		}
+	}
+	
+		//send error text to console
+	print("Kaleidescape Device ID %d: Error %03d, %s  %s\n", Player_Id, error_code, description, details);
+}
+
+/* Small parser to get messages addressed to id 01, zone 0 (initialization messages) */
+Function Parse_Init2_Message(string message)	{
+	integer num_args;	// the number of args
+	string  args[MAX_RESPONSE_ARGS][MAX_RESPONSE_ARG_LEN];	// the args within the message
+
+	#IF_DEFINED DEBUG
+	print("Parsing Init2 message\n");
+	#ENDIF
+	
+	if(!Valid_Message(message, 1, 0))			//ensure the message isn't garbled
+		return;
+		
+    message = right(message,len(message)-5);	//strip off the header
+    message = left(message,len(message)-3); 	//strip off the checksum
+    
+    num_args = 0;
+    while(len(message) && num_args<MAX_RESPONSE_ARGS)  {	//while there's a field in the message, and enough room in our response array
+    	args[num_args] = Extract_Field(message);			//remove it and put in in the array
+    	num_args = num_args + 1;							//indicate where to store the next arg (and the amount we've collected)
+    }
+	
+  	if(args[1] = "DEVICE_INFO")	{				//what type of device are we talking to
+  		//args[2] = device type
+  		Connected_Device_SN = args[3];
+  		Connected_Device_ID = atoi(args[4]);
+  		//args[5] = device IP address
+		#IF_DEFINED DEBUG
+		print("Found DEVICE_INFO message.  args[3]=%s\n",args[3]);
+		#ENDIF
+		
+  	}
+  	
+}
+
+/* Decrypt the device type, and ensure that the device is a valid one that can be controlled */
+Integer_Function Device_Type_Check(integer Device_Type)	{
+	string Type_Text[30];
+	
+	switch(Device_Type)	{
+		case(1):	{
+			Type_Text = "a Server";
+		}
+		
+		case(2):	{
+			Type_Text = "a Player";
+			return(on);					//halt execution of this function with a happy result
+		}
+		
+		case(3):	{
+			Type_Text = "a Bulk Loader";
+		}
+		
+		case(5):	{
+			Type_Text = "a DVD Reader";
+		}
+		
+		case(7):	{
+			Type_Text = "";
+			return(on);
+		}
+		
+		case(8):	{
+			Type_Text = "a Music Player";
+			return(on);					//halt execution of this function with a happy result
+		}
+		
+		default:	{
+			Type_Text = "an unknown device";
+		}
+	}
+	
+	//if control falls here, we are not talking to a player.
+	
+	print("\nKaleidescape Device ID %d is %s, not a Player.\nThe Kaleidescape module only controls a Kaleidescape Player.\n\n", Player_ID, Type_Text);
+	return(off);		//return a sad result
+}   
+
+/* Function to determine the position of the list scroll bar */
+Integer_Function Analog_List_Position()  {
+	if(List_Length <= TP_Window_Length)				//if the list fits in the window
+		return(MAX_INT / 2);						//just center the feedback
+		
+	return( MAX_INT - mulDiv( MAX_INT, (List_Position-1), (List_Length - TP_Window_Length) ) );
+}
+
+/* Function to determine the size of the list scroll bar */
+Integer_Function Analog_List_Bar_Size() {
+	if(List_Length <= TP_Window_Length)				//if the list fits in the window
+		return(0);												//zero size bar - s/b greyed out
+	
+	return( mulDiv( MAX_SCROLL_BAR_SIZE, TP_Window_Length, List_Length )+1 );
+}
+
+/* Function to determine if a given position is within bounds */
+Integer_Function Bounds_Check_List_Position(integer P)  {
+	if(P = 0)
+		return(1);
+	
+	if(List_Length > TP_Window_Length)  {					//if there's more list than window
+		if(P > (List_Length-TP_Window_Length+1) )
+			return(List_Length-TP_Window_Length+1);
+		return(P);
+	}
+	
+	return(1);								//if not, then just set the position to 1
+}
+
+/* Function to fill the text window with blanks, given a starting line */
+Function Blank_Fill_Window(integer start)	{
+	integer line;
+	
+	for(line = start to TP_Window_Length)	{
+		List_Serial_FB[line] = " ";									//populate with blank
+		List_Select_Digital_FB[line] = off;
+		List_Status_Analog_FB[line] = 0;
+	
+	}
+}
+
+/* Function to draw the text window data on the touch panel */
+/* unused
+Function Fill_Window()  {
+	integer line;
+	signed_integer list_display;
+	integer choices;
+    
+	#IF_DEFINED DEBUG
+	print("Filling Window.\n");
+	#ENDIF
+   
+	if(List_Selection > List_Length)
+		List_Selection = 0;
+    
+	List_Position = Bounds_Check_List_Position(List_Position);
+	
+	Render_Browse_Back();
+	
+	List_Scroll_Available = (List_Length > TP_Window_Length);
+	List_Analog_Scroll_FB = Analog_List_Position();
+	List_Analog_Scroll_Size_FB = Analog_List_Bar_Size();
+    
+    #IF_DEFINED DEBUG
+   	print("List_Length=%u, TP_Window_Length=%u, Analog_List_Bar_Size()=%u\n",List_Length, TP_Window_Length, Analog_List_Bar_Size());
+   	#ENDIF
+    
+	list_display = 1;		//start at the beginning of the list (Get_List handles paging)
+
+	choices = 0;
+	
+	for(line = 1 to TP_Window_Length)					//step through all fields, and populate the window
+	{
+		if( (list_display > 0) && (list_display <= List_Length) )	//if this reference is valid...
+		{
+			if(List[list_display].Behavior = BEHAVIOR_BROWSE)	{	// if this is a browse selection
+				List_Serial_FB[line] = List[list_display].Display + BROWSE_AVAILABLE_INDICATOR;		//add the browse indicator
+			} 
+			else {
+				List_Serial_FB[line] = List[list_display].Display;			//populate with data
+			}
+			List_Select_Digital_FB[line] = (List[list_display].Position = List_Selection);
+			List_Status_Analog_FB[line] = List[list_display].Queue_Status;	//indicate the queue status			
+		}
+		else {															//if not... (line out of range of data)
+			List_Serial_FB[line] = " ";									//populate with blank
+			List_Select_Digital_FB[line] = off;
+			List_Status_Analog_FB[line] = 0;
+		}
+		
+		list_display = list_display + 1;							//increment for the next loop
+	}
+}
+*/
+
+
+/* Function to update the selection on an already drawn TP window */
+Function Update_Selection()	{
+	integer line, choices;
+	signed_integer list_display;
+	
+	list_display = 1;
+	
+	if(List_Selection > List_Length)
+		List_Selection = 0;
+
+	choices = 0;
+	
+	for(line = 1 to TP_Window_Length)	{					//step through all fields, and populate the window
+		if( (list_display > 0) && (list_display <= List_Length) )	{	//if this reference is valid...
+			List_Select_Digital_FB[line] = (List[list_display].Position = List_Selection);
+		}
+		else	{
+			List_Select_Digital_FB[line] = off;
+		}				
+		list_display = list_display + 1;							//increment for the next loop
+	}
+}
+
+
+
+ 
+ 
+
+/* Increment the crumb, but roll it to 1 if over the max */
+Function Crumb_Increment(byRef integer n)  {
+	n = n+1;
+	if(n > MAX_BREADCRUMBS)
+		n = 1;
+}
+/* Decrement the crumb, but roll it to max if under 1 */
+Function Crumb_Decrement(byRef integer n)  {
+	n = n-1;
+	if(n = 0)
+		n = MAX_BREADCRUMBS;
+}
+
+/* Push a new crumb onto the list */
+Function Push_Crumb(string node)	{
+		//store the current info into the current crumb
+	Crumb[Target_Crumb].Position = List_Position;
+	Crumb[Target_Crumb].Selection = List_Selection;
+
+		//increment the crumb
+	Crumb_Count = Crumb_Count + 1;
+	if(Crumb_Count > MAX_BREADCRUMBS)  {
+		Crumb_Count = MAX_BREADCRUMBS;
+	}
+	Crumb_Increment(Target_Crumb);
+	
+	if(Target_Crumb = First_Crumb)	{	//if we've ended up on top of the first crumb
+		Crumb_Increment(First_Crumb);	//increment the first crumb
+		Crumb[First_Crumb].Handle = Crumb[0].Handle;	//overwrite the new first crumb's handle
+		Crumb[First_Crumb].Position = 1;				//overwrite the position
+		Crumb[First_Crumb].Selection = 0;				//clear the selection
+	}
+	
+	Crumb[Target_Crumb].Handle = node;		//store the new node
+	
+	List_Selection = 0;	//select nothing
+	List_Position = 1;		//top of the list
+
+	#IF_DEFINED DEBUG
+	print("Pushed Crumb: First_Crumb=%u, Crumb_Count=%u, Target_Crumb=%u", First_Crumb, Crumb_Count, Target_Crumb);
+	#ENDIF
+}
+
+/* remove the latest crumb from the list */
+Function Pop_Crumb()	{
+          
+          //this is a failsafe - should never happen
+	if((Crumb_Count=1) && (Crumb[Target_Crumb].Handle != Crumb[0].Handle))	{	//if we're at the first crumb, and it's not blank
+		Get_Top_List();					//reset the list at the top
+		return;
+	}
+    
+    if(Crumb_Count = 1) return;			//do nothing if we're at the top crumb
+    
+	Crumb_Count = Crumb_Count - 1;
+	
+	Crumb_Decrement(Target_Crumb);		//decrement the target crumb
+	
+	List_Selection = Crumb[Target_Crumb].Selection;	//reset this crumb's selection
+	List_Position = Crumb[Target_Crumb].Position;	//reset this crumb's position
+	
+	#IF_DEFINED DEBUG
+	print("Popped Crumb: First_Crumb=%u, Crumb_Count=%u, Target_Crumb=%u", First_Crumb, Crumb_Count, Target_Crumb);
+	#ENDIF
+}
+
+
+/* This checks the bounds of the received data and 
+   ensures that when the window size changes, the data fits properly */
+Function Check_Window_Reposition()	{
+	//List_Length is the number of lines in the entire result set (shown or not)
+	//Last_Item is the last thing shown in the window
+	//List_Position is the item shown in the first position of the window
+	//TP_Window_Length is the length of the window on the touch panel
+	
+	if(List_Length <= TP_Window_Length)	{	//if the list fits in the window
+		if(Last_Item <> List_Length)	{	//if the last item on the list isn't the last item displayed
+			List_Position = 1;				//reset the list to the top
+			Get_List();						//get the new list (will result in double-drawn window)
+		}
+	}
+	else	{								//if the list doesn't fit in the window
+		if(Last_Item < TP_Window_Length)	{	//if the entire list doesn't fill the window (last item short of the window length)
+			List_Position = List_Length-TP_Window_Length+1;	//reset to the bottom of the list (last item occupies the last spot in the window)
+			Get_List();						//get the new list (will result in double-drawn window)
+		}	
+	}
+}
+
+/* Render the content details */
+Function Show_Content_Details(string label, string text)	{
+	string display[255];
+	string send_text[255];
+	       
+   	     if(label = "Artist")		display = "Artist\r" + text;
+   	else if(label = "Artists")		display = "Artist\r" + text;
+   	else if(label = "Performer")	display = "Performer\r" + text; 
+   	else if(label = "Performers")	display = "Performer\r" + text; 
+   	else if(label = "Composer")		display = "Composer\r" + text; 
+   	else if(label = "Composers")	display = "Composer\r" + text; 
+   	else if(label = "Genre")		display = "Genre\r" + text; 
+   	else if(label = "Genres")		display = "Genre\r" + text; 
+   	else if(label = "Album_year") 	display = "Released\r" + text; 
+   	else if(label = "Year")		 	display = "Released\r" + text; 
+   	else if(label = "Track_number") display = "Track " + text;
+   	
+   		//handle the following in a special way
+   	else if(label = "Cover_URL") 	Image_URL = text;
+   	
+   	else if(label = "Album_title") 				{
+   		if(Detail_Type = DETAIL_IS_ALBUM)				//if we're looking at album details
+   			Details_Title = text;								//make the window title the name of the album
+   		else
+		   	display = "Album\r" + text; 				//otherwise, just liste it with everything else
+   	}
+   	
+   	else if(label = "Album_content_handle")		{
+   		if(Detail_Type = DETAIL_IS_TRACK)		{		//if we're looking at track details
+			send_text = "GET_CONTENT_DETAILS:"+ text +"::";	//get the album details too
+		}
+   	}
+   	
+   	else	{
+   		if(Details_Visible)	{
+   		    	 if(label = "Track_title")	Details_Title = text;
+   			else if(label = "Title")		Details_Title = text;
+   		}
+   	}
+   	
+   	if(len(display) > 0)	{		//if we've got something to display
+   		if(!First_Detail_Flag)		//if it's not the first detail
+   			display = APPEND_TEXT_2 + "  \r\r" + display;		//prepend the special code to make text append on the TP + a blank line
+   			
+   		First_Detail_Flag = off;	//clear the flag to ensure any text following is appended
+   		
+   		Info = display;				//send this text to the touch panel
+   	}
+}
+
+   
+/* Parse the string within "message" and process */
+Function Parse_Message(string message) {
+	integer length;		// keep track of the length of the message
+	integer num_args;	// the number of args
+	integer line, loop, ref;
+	string  args[MAX_RESPONSE_ARGS][MAX_RESPONSE_ARG_LEN];	// the args within the message
+	
+	
+	length = len(message);
+    
+    // Remove trailing carriage return and/or linefeed
+    while (length > 0 && (byte(message,length) = CR || byte(message,length) = LF)) {
+        length = length - 1;
+    }
+	
+	message = left(message, length);
+	
+	//trap the PLAYER_RESTART even if the message isn't addressed to us, and if it lacks the leading 000:
+	if(  find("/!/PLAYER_RESTART:/",message)     ||
+	     find("/!/000:PLAYER_RESTART:/",message)    )  {
+	     
+		Reset_Interface();		//indicate that the player isn't yet initialized
+		return;
+	}
+		
+	
+	if(Player_Initialized = 0)	{					//if the player isn't initialzied
+		if( find("01/2/000:DEVICE_INFO",message) )	{	//if this is an info message about the attached device
+			Parse_Init2_Message(message);			//call the special parser
+			return;
+		}
+	}
+	
+	
+    if (!Valid_Message(message, Player_ID, Stream_ID))			//determine if the message is valid
+    	return;
+    
+    	
+	#IF_DEFINED DEBUG
+	print("Received:  %s\n",message);
+	#ENDIF
+
+    if(byte(message,3) = '.')	{		//if there's a stream ID
+	    message = right(message,len(message)-8);	//strip off the header (w/stream ID)
+    }
+    else	{
+	    message = right(message,len(message)-5);	//strip off the header
+    }
+    
+    message = left(message,len(message)-3); 	//strip off the checksum
+    
+    num_args = 0;
+    while(len(message) && num_args<MAX_RESPONSE_ARGS)  {	//while there's a field in the message, and enough room in our response array
+    	args[num_args] = Extract_Field(message);			//remove it and put in in the array
+    	num_args = num_args + 1;							//indicate where to store the next arg (and the amount we've collected)
+    }
+        	
+	#IF_DEFINED DEBUG
+	if(len(message) > 0)
+		print("Additional unprocessed data:  \"%s\"\n",message);
+	#ENDIF
+    
+    if(!(args[0] = "000"))  {				//if there is an error condition noted by the player
+    	Player_Error(atoi(args[0]),args[1]);		//pass the error code to the error handler
+    	return;								//halt processing
+   	}
+    	
+    if(num_args = 1)  {						//if the return code is the only thing the player is sending
+    	return;								//we're done.
+   	}						
+
+    	
+
+	if(args[1] = "MUSIC_PLAY_STATUS")	{
+		
+		Play_Mode		= atoi(args[2]);
+		//Speed			= atoi(args[3]);
+		Song_Length		= atoi(args[4]);
+		Song_Position	= atoi(args[5]);
+		//%progress		= atof(args[6]);	//calculated against Length/Position for better accuracy
+		
+		if(Song_Length <> 0)				//trap div by zero errors when playback stops
+			Song_Level = mulDiv(Song_Position, MAX_INT, Song_Length);
+		else
+			Song_Level = 0;
+			
+		Song_Remaining = Song_Length - Song_Position;
+		
+		if(last_Play_Mode != Play_Mode)	{	//if the play mode has changed
+			last_Play_Mode = Play_Mode;		//remember the play mode
+			Gently_Get_List();				//refresh the list (gently)
+		}
+		return;
+	}
+
+
+
+	if(args[1] = "MUSIC_TITLE")	{
+		Song_Name = args[2];
+		Artist_Name = args[3];
+		Album_Name = args[4];
+		
+		if(len(args[2]) > 0)	{		//if there is a song name
+		}
+		else
+			Details_Title = " ";
+		
+		Now_Playing_Handle = args[5];
+		
+		if(Details_Requested = DETAILS_NOWPLAYING)	{		//if we're looking at now playing details
+			Get_Details(Now_Playing_Handle, DETAILS_NOWPLAYING);	//retrieve the current song data
+			if(len(args[2]) > 0)	{		//if there is a song name
+				if(len(args[3]) > 0)		//and an artist
+					Details_Title = args[2] + " - " + args[3];		//show the song - artist
+				else
+					Details_Title = args[2];							//otherwise, just the song
+			}
+			else
+				Details_Title = " ";		//if there is no song, show nothing
+		}
+		
+		Gently_Get_List();
+		return;
+	}
+
+	if(args[1] = "NEXT_MUSIC_TITLE")	{
+		if(len(args[2]) > 0)	{		//if there is a song name
+			if(len(args[3]) > 0)		//and an artist
+				Next_Song = args[2] + " - " + args[3];		//show the song - artist
+			else
+				Next_Song = args[2];							//otherwise, just the song
+		}
+		else
+			Next_Song = " ";		//if there is no song, show nothing
+			
+		Next_Playing_Handle = args[5];
+		
+		if(Details_Requested = DETAILS_NEXTPLAYING)	{		//if we're looking at next playing details
+			Get_Details(Next_Playing_Handle, DETAILS_NEXTPLAYING);	//retrieve the current song data
+			if(len(args[2]) > 0)	{		//if there is a song name
+				if(len(args[3]) > 0)		//and an artist
+					Details_Title = args[2] + " - " + args[3];		//show the song - artist
+				else
+					Details_Title = args[2];							//otherwise, just the song
+			}
+			else
+				Details_Title = " ";		//if there is no song, show nothing
+		}
+		
+		return;
+	}
+
+    
+    if(args[1] = "MUSIC_NOW_PLAYING_STATUS")	{		//we get this message when now playing information has changed
+    	Repeat_Status = (args[4] = "1");
+    	Random_Status = (args[5] = "1");
+    	
+    	Gently_Get_List();								//refresh the current list
+    	return;
+    }
+    
+	if(args[1] = "BROWSE_RESULTS_OVERVIEW")	{
+		//Crumb[Target_Crumb].Handle = args[2];	//this should be redundant
+		List_Title = args[3];
+		Last_Item = atoi(args[4]);
+		List_Length = atoi(args[5]);
+		
+		Render_Browse_Back();
+
+		List_Scroll_Available = (List_Length > TP_Window_Length);
+		List_Analog_Scroll_FB = Analog_List_Position();
+		List_Analog_Scroll_Size_FB = Analog_List_Bar_Size();
+	
+		
+		if(List_Length = 0)	{
+			Blank_Fill_Window(1);
+			Get_List_Running_Flag = off;
+		}
+		Check_Window_Reposition();
+			
+		return;
+	
+	}
+
+	if(args[1] = "BROWSE_RESULT")	{
+		line = atoi(args[2]);
+		
+		if(line > TP_Window_Length)	{
+			#IF_DEFINED DEBUG
+			print("Not rendering out-of-bound line number %d", line);
+			#ENDIF
+			return;
+		}
+		
+		
+		List[line].Position = atoi(args[3]);			//Position of this item within the whole list
+		List_Select_Digital_FB[line] = (List[line].Position = List_Selection);
+				
+		//List[line].Display 	= args[4];				//Text to display
+		List_Status_Analog_FB[line] = atoi(args[5]);	//Now_Playing status
+		List[line].Behavior = atoi(args[7]);
+		List[line].Handle 	= args[8];
+		List[line].Pop		= atoi(args[9]);
+		
+		if(List[line].Behavior = BEHAVIOR_BROWSE)	{	// if this is a browse selection
+			List_Serial_FB[line] = args[4] + BROWSE_AVAILABLE_INDICATOR;		//add the browse indicator
+		} 
+		else {
+			List_Serial_FB[line] = args[4];			//populate with data
+		}
+				
+		if(line = Last_Item)  {											//if this is the last line
+			//blank the rest of the text window
+			Blank_Fill_Window(line+1);
+			Get_List_Running_Flag = off;								//clear the running flag
+		}
+		return;
+	}	
+
+
+	if(args[1] = "CONTENT_DETAILS_OVERVIEW")	{
+		//Info = " ";		//clear the field for more data
+		if(Detail_Type = 0)	{		//if we haven't yet discovered the type of detail this is...
+									//(as a track will make at least 1 other GET_DETAILS request, only remember the first type)
+									
+									//args[4] describes what table this info comes from
+			if(args[4] = "tracks")	Detail_Type = DETAIL_IS_TRACK;
+			if(args[4] = "albums")	Detail_Type = DETAIL_IS_ALBUM;
+		}
+		return;
+	}
+    
+    if(args[1] = "CONTENT_DETAILS" && len(args[4]) > 0 )	{		//if this is a detail, and there is detail data
+        
+        Show_Content_Details(args[3], args[4]);
+    	return;
+    }
+    
+  	if(args[1] = "DEVICE_INFO")	{				//what type of device are we talking to (sanity check)
+  		if(Device_Type_Check(atoi(args[2])) )	{	//only set the parameters if the device type is valid
+  			Player_SN = args[3];
+  			//args[4] = device ID
+  			//args[5] = device IP address
+  		}
+  		return;
+  	}
+  	
+	if(args[1] = "PROTOCOL")	{
+		Protocol_Version = atoi(args[2]);		//indicate the protocol version number
+		return;
+	} 
+    
+    if(args[1] = "USER_DEFINED_EVENT")  {
+    	User_Defined_Event = args[2];
+    	delay(1);
+    	User_Defined_Event = "";
+    	return;
+    }
+    
+    
+    if(args[1] = "FRIENDLY_NAME")	{
+    	Friendly_Name = args[2];
+    }
+ 
+}
+
+/* Perform the action associated with the given button */
+Function Do_Button_Item(integer lref)	{
+	string tmp[100];
+	integer loop;
+	
+	switch(List[lref].Behavior)	{
+		case(BEHAVIOR_BROWSE):	{
+			Push_Crumb(List[lref].Handle);		//create the new crumb		
+			Get_List();							//go get the list
+			return;								//do not perform any pop actions
+		}
+		case(BEHAVIOR_ACTION):	{
+			MakeString(tmp,"PERFORM_ACTION:%s:::",List[lref].Handle);
+			Send(tmp);
+		}
+		case(BEHAVIOR_DETAILS):	{
+			Get_Details("",0);		//clear the current details
+			Details_Visible = on;
+			Get_Details(List[lref].Handle, DETAILS_BROWSING);	//get the details
+		}
+
+	}
+	
+	if(Crumb_Count<=1) return;	//if we're at the top of the list, do not try and pop the crumb
+	
+	if(List[lref].Pop > 0)	{
+		for(loop = 1 to List[lref].Pop)	{	//pop the number of crumbs as indicated by the pop number
+			Pop_Crumb();
+		}
+		Get_List();
+	}
+}
+
+
+/* Function to handle the two Place selections - browse and nowplaying */
+Function Handle_Place_Selections(integer selected)	{
+	if(!Details_Visible & Display = selected)	{				//if the details aren't showing, and the display is reselected
+		#IF_DEFINED DEBUG
+		print("Getting top list\n");
+		#ENDIF
+		Get_Top_List();
+		return;												//pass back to the PUSH that it's just a reselect
+	}
+	#IF_DEFINED DEBUG
+	print("Setting Feedback\n");
+	#ENDIF
+	Display = selected;											//remember the state;
+	Browse_Selected = (Display = DISPLAY_BROWSE);				//set the proper feedback
+	Now_Playing_Selected = (Display = DISPLAY_NOWPLAYING);
+	Details_Visible = off;
+	#IF_DEFINED DEBUG
+	print("Swapping crumbs\n");
+	#ENDIF
+	Swap_Crumbs();												//swap the crumbs
+	Get_List();													//get the list
+	return;												//pass back to the push that it's a new select
+}
+
+
+/* Move the list by a given amount */
+Function Move_List(signed_integer direction)	{
+	signed_integer new_position;
+
+	new_position = List_Position + direction;
+
+	if(new_position <= 0)	{						//bounds check the lower bound
+		new_position = 1;
+	}
+	else	{
+		new_position = Bounds_Check_List_Position(new_position);	//bounds check the upper bound
+	}
+
+	if(List_Position <> new_position)	{			//if the result is different then the current position
+		List_Position = new_position;				//set the new position
+		Get_List();									//retrieve the new list
+	}
+
+}
+
+/* handle all the up/down arrow presses and releases */
+Function Accelerate_Movement(signed_integer direction)	{
+	Movement_Speed = abs(direction);	//starting speed
+	Movement_Direction = direction;
+	
+	Move_List(direction);					//move the list
+	
+	wait(0, ACCELERATING_MOVEMENT)	{		//used as a non-reentrant fork
+		signed_integer motion;
+		integer last_position;
+		
+		while(Movement_Speed > 0)	{
+
+			while(Get_List_Running_Flag)	{			//if the get list is still running
+				delay(50);									//pause for a split second
+			}
+		
+			motion = (Movement_Speed * Movement_Direction);	//move the position
+			last_position = List_Position;					//remember the last position
+					
+			Move_List(motion);
+			
+			if(last_position = List_Position)				//if the list didn't move
+				break;										//quit trying (reached a bound)
+				
+			Movement_Speed = Movement_Speed * 2;		//accelerate
+			if(Movement_Speed > (TP_Window_Length / 2))
+				Movement_Speed = TP_Window_Length / 2;	//max acceleration
+				
+		}		
+	}
+
+	if(direction = 0)						//if this is a cancel command
+		cancelWait(ACCELERATING_MOVEMENT);	//kill the wait to allow next press to activate immediately
+}
+
+Function Check_TP_Window_Length()	{
+	integer loop;
+	integer new_TP_Window_Length;
+	integer last_TP_Window_Length;
+	
+	if(List_Window_Length = 0) return;								//do nothing if given 0
+	
+	last_TP_Window_Length = TP_Window_Length;						//memorize the old value
+	TP_Window_Length = List_Window_Length;							//set the new value
+	new_TP_Window_Length = TP_Window_Length;						//initialize the test value
+	
+    for(loop = 1 to TP_Window_Length)  {							// step through all TP fields
+    	if(!isSignalDefined(List_Select_Digital[loop]))  {	// if this signal isn't defined
+    		print("ERROR, Kaleidescape SATP List_Select%d is required.\n", loop); 
+    		if(new_TP_Window_Length > (loop-1))					// store the lowest valid signal
+    			new_TP_Window_Length = loop-1;
+    	}
+    }
+	
+    for(loop = 1 to TP_Window_Length)  {							// step through all TP fields
+    	if(!isSignalDefined(List_Select_Digital_FB[loop]))  {	// if this signal isn't defined
+    		print("ERROR, Kaleidescape SATP List_Selected%d is required.\n", loop); 
+    		if(new_TP_Window_Length > (loop-1))					// store the lowest valid signal
+    			new_TP_Window_Length = loop-1;
+    	}
+    }
+
+    for(loop = 1 to TP_Window_Length)  {							// step through all TP fields
+    	if(!isSignalDefined(List_Serial_FB[loop]))  {	// if this signal isn't defined
+    		print("ERROR, Kaleidescape SATP List_Text%d is required.\n", loop); 
+    		if(new_TP_Window_Length > (loop-1))					// store the lowest valid signal
+    			new_TP_Window_Length = loop-1;
+    	}
+    }
+
+    for(loop = 1 to TP_Window_Length)  {							// step through all TP fields
+    	if(!isSignalDefined(List_Status_Analog_FB[loop]))  {	// if this signal isn't defined
+    		print("ERROR, Kaleidescape SATP List_Queue_Status%d is required.\n", loop); 
+    		if(new_TP_Window_Length > (loop-1))					// store the lowest valid signal
+    			new_TP_Window_Length = loop-1;
+    	}
+    }
+    
+    if(TP_Window_Length != new_TP_Window_Length)	{
+    	print("Kaleidescape SATP setting List_Window_Length to largest valid value: %d\n", new_TP_Window_Length);
+    	TP_Window_Length = new_TP_Window_Length;
+    }
+    else	{
+    	#IF_DEFINED DEBUG
+    	print("Kaleidescape SATP setting List_Window_Length to %d\n", TP_Window_Length);
+    	#ENDIF
+    }
+	
+	if(last_TP_Window_Length != TP_Window_Length)	{			//if the value has actually changed
+		if(Player_Initialized != 0)								//if the player is initialized
+			Get_List();											//attempt to get the list
+	}
+	
+
+}
+/*******************************************************************************************
+  Event Handlers
+*******************************************************************************************/
+
+CHANGE Rx$ {
+	#IF_DEFINED DEBUG
+	print("Input buffer length is %u.\n",len(Rx$));
+	#ENDIF
+	
+	//   The Kaleidescape sends its commands terminated with CR/LF.  So
+    //   we shouldn't process anything until there's a linefeed ($0A) in
+    //   the buffer, otherwise we might try to process a partial command.
+    //   Also, after processing the command, remove it from the buffer
+    //   and keep going until there are no more linefeeds.
+    
+    wait(0,RX_WAIT)  {				//ensure only 1 thread at a time
+    	string message[MAX_MESSAGE_LENGTH];	// temporary variable to hold individual message
+		while( find("\n",Rx$) )	 { // while there is a CR/LF pair
+			message = remove("\n", Rx$);	// remove individual message
+			call Parse_Message(message);	// parse that message
+			#IF_DEFINED DEBUG
+			print("Input buffer length is %u.\n",len(Rx$));
+			#ENDIF
+			ProcessLogic();
+		}
+	}
+}
+
+
+CHANGE Command_To_Player  {
+	string command[MAX_MESSAGE_LENGTH];
+	command = Command_To_Player + ":";	//can't pass the STRING_INPUT by reference
+	Send(command);
+}
+              
+              
+CHANGE Keyboard_Input  {
+	integer key;
+	string escape[1];
+	string command[MAX_MESSAGE_LENGTH];
+	
+	while(len(Keyboard_Input))  {	//step through all input on this serial line
+		key = getC(Keyboard_Input);			//pull out 1 char at a time
+		escape = "";							//reset the escape string
+		if((key = BACKSLASH) ||				//if the key needs to be escaped
+		   (key = ':') ||
+		   (key = '/') )
+			{escape = chr(BACKSLASH);}		//set the escape string
+		
+		MakeString(command,"KEYBOARD_CHARACTER:%s%c:", escape, key);	//build the keyboard string
+		Send(command);						//send the command
+	}
+}
+  
+  	
+	
+CHANGE Play_Script	{
+	string command[MAX_MESSAGE_LENGTH];
+	
+	if(len(Play_Script) > 0)	{			//if the name is not null
+		command = "PLAY_SCRIPT:" + Play_Script + ":";	//build the command
+		Send(command);						//send the built command
+		Play_Script = "";					//blank the input to allow re-triggering the same name
+	}
+}	
+	
+PUSH Connection_Open	{
+	Reset_Interface();
+}
+
+RELEASE Connection_Open	{		//clear feedback
+	Play_Mode = 999;
+	Song_Length = 0;
+	Song_Position = 0;
+	Song_Remaining = 0;
+	Song_Level = 0;	
+}
+
+PUSH List_Up	{
+	Accelerate_Movement(-TP_Window_Length+1);
+}
+
+PUSH List_Down	{
+	Accelerate_Movement(TP_Window_Length-1);
+}
+
+RELEASE List_Up
+RELEASE List_Down	{
+	Accelerate_Movement(0);				//stop movement
+}
+
+CHANGE List_Analog_Scroll_Act	{
+	integer new_position;
+	
+	if(List_Length <= TP_Window_Length)	//if the list fits the window, do nothing
+		terminateEvent;
+		
+//	new_position = mulDiv((MAX_INT - List_Analog_Scroll_Act), 
+//								(List_Length - TP_Window_Length + 1), MAX_INT) + 1;
+
+	new_position = mulDiv((MAX_INT - List_Analog_Scroll_Act), 
+								(List_Length + 1), MAX_INT) + 1;
+	
+	//make range within half of the bug size (relative window length) of each end of the bar
+	if(new_position <= TP_Window_Length/2)		//if the list position is at less than half the window length
+		new_position = 1;						//set it to the lowest point
+	else
+		new_position = new_position - TP_Window_Length/2;	//otherwise, knock off the top half of the window
+		
+        //bounds check to make out of bound values legit
+	new_position = Bounds_Check_List_Position(new_position);
+	
+	#IF_DEFINED DEBUG
+	print("Browse Scroll Received, new_position=%u, List_Position=%u\n",new_position, List_Position);
+	#ENDIF
+	
+	if(new_position = List_Position)
+		terminateEvent;
+		
+	List_Position = new_position;
+	Get_List();
+	
+}
+
+PUSH List_Begin	{
+	Get_Top_List();
+}
+
+PUSH List_Back	{
+	if(Crumb_Count > 1)	{
+		Pop_Crumb();
+		Get_List();
+	}
+	else {
+		Pop_Crumb();		//pop crumb will ensure that the current crumb is OK
+	}
+}
+
+
+PUSH List_Select_Digital	{
+    integer this;
+    integer my_List_Selection;
+	
+    this = getLastModifiedArrayIndex();
+    
+    my_List_Selection = this;
+    if(my_List_Selection > List_Length) terminateEvent;		//if there's nothing there, do nothing
+    
+    if(List[my_List_Selection].Position = List_Selection)	{			//if it's already selected
+    	Do_Button_Item(my_List_Selection);
+    	terminateEvent;
+    }
+    
+    List_Selection = List[my_List_Selection].Position;				//select this item
+    
+    Update_Selection();									//update the display
+    
+   	//delay(50);										//wait for half a second
+   	Do_Button_Item(my_List_Selection);
+   	
+	if(Crumb[0].Position = DISPLAY_NOWPLAYING)					//if we're viewing the NOWPLAYING list...
+		List_Selection = 0;										//clear the list selection on next window update
+
+
+}
+
+
+
+PUSH Browse_Select	{	
+	#IF_DEFINED DEBUG
+	print("Browse Select pushed\n");
+	#ENDIF
+	Handle_Place_Selections(DISPLAY_BROWSE);		//perform Browse selection actions
+}
+
+PUSH Now_Playing_Select	{
+	Handle_Place_Selections(DISPLAY_NOWPLAYING);		//perform NowPlaying selection actions
+}
+
+
+PUSH Details_Cancel	{
+	Get_Details("",0);		//clear the current details
+	Details_Visible = off;	//close window	
+	Send("GET_MUSIC_TITLE:");	//update this info
+	
+}
+
+PUSH Now_Playing_Details	{
+	Details_Visible = on;
+	Get_Details(Now_Playing_Handle, DETAILS_NOWPLAYING);
+}
+
+PUSH Next_Playing_Details	{
+	Details_Visible = on;
+	Get_Details(Next_Playing_Handle, DETAILS_NEXTPLAYING);
+}
+ 
+ 
+ 
+CHANGE List_Window_Length		{
+	Check_TP_Window_Length();
+}
+
+/*******************************************************************************************
+  Main()
+*******************************************************************************************/
+Function Main()
+{
+	integer loop;
+	
+	MODULE_DESCRIPTION = "Kaleidescape Crestron SATP Module v5.0.1  $Date: 2006/4/7 $ $Revision: #4 $";
+	
+	Resetting_Interface = 0;			//reset the flag
+	Player_Initialized = 0;				//clear the init flag
+	
+    WaitForInitializationComplete();
+    
+    delay(500);							//wait an additional few seconds for ALL logic to be done propogating
+    
+	First_Detail_Flag = on;    
+    
+    List_Position = 1;
+    List_Selection = 0;
+    SetArray(Last_Button_Label, 0);
+    
+    Display = DISPLAY_BROWSE;
+    Browse_Selected = on;
+    Crumb[0].Position 	= DISPLAY_BROWSE;				//Crumb[0].Position used as an indication of the list type
+    Crumb[0].Handle		= BROWSE_START_NODE;			//Crumb[0].Handle is the starting node
+    
+    Stored_Crumb[0].Position 	= DISPLAY_NOWPLAYING;
+    Stored_Crumb[0].Handle		= NOW_PLAYING_START_NODE;    
+    
+    print("%s - Control Protocol Device ID %d\n",Module_Description, Stated_Player_ID);
+    
+    Check_TP_Window_Length();
+    
+	Reset_Interface();
+}

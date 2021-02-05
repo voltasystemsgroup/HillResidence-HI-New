@@ -1,0 +1,56 @@
+<Device Model="AV3">
+   <Network Type="Cresnet" Id="04"/>
+   <Network Type="Ethernet" Id="05">
+      <Device Model="DM-MD16x16" DeviceId="13" Name="DM-MD16x16 [VIDEOSW_001]"/>
+      <Device Model="SWAMP" DeviceId="14" Name="SWAMP-24x8 (ASW001)."/>
+      <Device Model="CEN-RFGW-EX" DeviceId="21" Name="CEN-RFGW-EX (MBED)">
+         <Network Type="RF">
+            <Device Model="HR-150,HRI-150" DeviceId="11" Name="HH001 [MBED]"/>
+            <Device Model="HR-150,HRI-150" DeviceId="12" Name="HH002 [VANITY]"/>
+            <Device Model="TSR-302" DeviceId="13" Name="TSR-302 (EX)"/>
+         </Network>
+      </Device>
+      <Device Model="CEN-RFGW-EX" DeviceId="22" Name="CEN-RFGW-EX (MEDIA ROOM)">
+         <Network Type="RF">
+            <Device Model="HR-150,HRI-150" DeviceId="11" Name="HH006 [MEDIA]"/>
+            <Device Model="HR-150,HRI-150" DeviceId="12" Name="HH007 [ANTHONY]"/>
+            <Device Model="HR-150,HRI-150" DeviceId="13" Name="HH008 [GUEST]"/>
+         </Network>
+      </Device>
+      <Device Model="CEN-RFGW-EX" DeviceId="23" Name="CEN-RFGW-EX (KITCHEN)">
+         <Network Type="RF">
+            <Device Model="HR-150,HRI-150" DeviceId="11" Name="HH003 [GREAT ROOM]"/>
+            <Device Model="HR-150,HRI-150" DeviceId="12" Name="HH004 [NOOK]"/>
+            <Device Model="HR-150,HRI-150" DeviceId="13" Name="HH005 [OFFICE]"/>
+         </Network>
+      </Device>
+      <Device Model="CEN-RFGW-EX" DeviceId="24" Name="CEN-RFGW-EX (GYM)">
+         <Network Type="RF">
+            <Device Model="HR-150,HRI-150" DeviceId="11" Name="HH009 [GYM]"/>
+         </Network>
+      </Device>
+      <Device Model="CEN-RFGW-EX" DeviceId="25" Name="CEN-RFGW-EX (Shared Ethernet)"/>
+      <Device Model="CEN-RFGW-EX" DeviceId="26" Name="CEN-RFGW-EX (Shared Ethernet)"/>
+      <Device Model="CEN-RFGW-EX" DeviceId="27" Name="CEN-RFGW-EX (Shared Ethernet)"/>
+      <Device Model="TSW-760" DeviceId="31" Name="TP001 [GR LANI]"/>
+      <Device Model="TSW-1050" DeviceId="32" Name="TP002[GR HALL]"/>
+      <Device Model="TSW-752" DeviceId="33" Name="TP003 [KITCHEN]"/>
+      <Device Model="TSW-1050" DeviceId="34" Name="TP004 [MBATH]"/>
+      <Device Model="TSW-1050" DeviceId="35" Name="TP005 [MBED]"/>
+      <Device Model="TSW-750" DeviceId="36" Name="TP006 [MSITTING]"/>
+      <Device Model="TSW-760" DeviceId="37" Name="TP007 [FOYER]"/>
+      <Device Model="TSW-1050" DeviceId="38" Name="TP008 [OFFICE]"/>
+      <Device Model="TSW-760" DeviceId="39" Name="TP009 [MEDIA ROOM]"/>
+      <Device Model="TSW-1050" DeviceId="40" Name="TP010 [NOOK]"/>
+      <Device Model="TSW-760" DeviceId="41" Name="TSW-760 [GYM]"/>
+      <Device Model="TSW-760" DeviceId="42" Name="TSW-760 [GARAGE]"/>
+      <Device Model="Crestron_App" DeviceId="4A" Name="(iPad001)"/>
+      <Device Model="Crestron_App" DeviceId="4B" Name="(iPad002)"/>
+      <Device Model="Crestron_App" DeviceId="4C" Name="(iPad003)"/>
+      <Device Model="Autonomic MMS-5A" DeviceId="60" Name="Autonomic MMS-MAIN"/>
+      <Device Model="Autonomic MMS-5A" DeviceId="61"/>
+      <Device Model="Autonomic MMS-5A" DeviceId="62" Name="Autonomic MMS-5B"/>
+      <Device Model="Autonomic MMS-5A" DeviceId="63" Name="Autonomic MMS-5C"/>
+      <Device Model="Autonomic MMS-5A" DeviceId="64" Name="Autonomic MMS-5D"/>
+   </Network>
+</Device>

@@ -1,0 +1,819 @@
+/*******************************************************************************************
+  SIMPL+ Module Information
+*******************************************************************************************/
+/*
+Programmer: Kaleidescape
+
+ 	(c) 2004 Kaleidescape Inc. This Source Code is the intellectual 
+property of Kaleidescape, Inc. Kaleidescape grants authorized Dealers 
+and Partners the non-exclusive right to modify and/or compile and/or 
+compress the Source Code, and upload such modified and/or compiled 
+and/or compressed Source Code to control systems that control at least 
+one licensed Kaleidescape System. No right is granted to otherwise 
+copy, reproduce, modify, upload, download, transmit, or distribute the 
+Source Code, or derivative works, in any way. The Source Code, and 
+derivative works, are protected by copyright, trade secret, and other 
+intellectual property laws and by international treaties, which 
+provide rights and obligations in addition to the rights and 
+obligations set forth here.
+
+*/
+
+/*******************************************************************************************
+  Compiler Directives
+*******************************************************************************************/
+#HINT "This processor is for use within the Kaleidescape Module." 
+
+#DEFINE_CONSTANT DEBUG 1
+
+//Useful characters that we'll use in the parsing code
+#DEFINE_CONSTANT CR 0x0D		 // Carriage return
+#DEFINE_CONSTANT LF 0x0A		 // Linefeed
+#DEFINE_CONSTANT TAB 0x09		 // Tab
+#DEFINE_CONSTANT BACKSLASH '/'   // /
+#DEFINE_CONSTANT ESCSLASH  '\\'	 // \
+
+#DEFINE_CONSTANT MAX_MESSAGE_LENGTH	256	// Used to initialize various arrays
+#DEFINE_CONSTANT MAX_RESPONSE_ARGS  15	// Number or arguments to account for in the player response
+#DEFINE_CONSTANT MAX_RESPONSE_ARG_LEN 80  //Maximum length of a single argument
+
+#DEFAULT_VOLATILE
+#ENABLE_STACK_CHECKING
+
+#HELP_BEGIN
+(c) 2004 Kaleidescape Inc.  Please see legal notice below.
+
+This processor is for use within the Kaleidescape Interface.
+
+Inputs:
+Player_ID	Indicates the player this module should communicate with.
+
+Direct_Connect	Indicates if the player is directly connected (1) or 
+			player is being routed through another player (0).
+
+Rx$			String input received from the player.
+
+Command_To_Player	Sends an arbritrary command to the player.
+
+Outputs:
+Tx$			String output sent to the player.
+
+All other signal names are derived from the manual
+
+----------------------------------------------------------------------
+
+LEGAL NOTICE
+    (c) 2004 Kaleidescape Inc. This Source Code is the intellectual 
+property of Kaleidescape, Inc. Kaleidescape grants the non-exclusive 
+right to modify and/or compile and/or compress the Source Code, and 
+upload such modified and/or compiled and/or compressed Source Code 
+to control systems that control at least one licensed Kaleidescape 
+System. No right is granted to otherwise copy, reproduce, modify, 
+upload, download, transmit, or distribute the Source Code, or 
+derivative works, in any way. The Source Code, and derivative works, 
+are protected by copyright, trade secret, and other intellectual 
+property laws and by international treaties, which provide rights 
+and obligations in addition to the rights and obligations set forth here.
+
+#HELP_END
+
+
+
+/*******************************************************************************************
+  DIGITAL, ANALOG and SERIAL INPUTS and OUTPUTS
+*******************************************************************************************/
+DIGITAL_INPUT Direct_Connect;
+DIGITAL_INPUT Touch_Channel;
+DIGITAL_INPUT Using_Masking;
+ANALOG_INPUT Player_ID;
+ANALOG_INPUT Touch_X;
+ANALOG_INPUT Touch_Y;
+DIGITAL_INPUT Connection_Reset;
+
+BUFFER_INPUT Rx$[MAX_MESSAGE_LENGTH];
+STRING_INPUT Command_To_Player[MAX_MESSAGE_LENGTH];
+STRING_INPUT Keyboard_Input[MAX_MESSAGE_LENGTH];
+
+STRING_INPUT Play_Script[MAX_MESSAGE_LENGTH];
+
+
+
+STRING_OUTPUT Tx$;
+
+ANALOG_OUTPUT Play_Mode;
+ANALOG_OUTPUT Title_Length;
+ANALOG_OUTPUT Title_Location;
+ANALOG_OUTPUT Title_Remaining;
+ANALOG_OUTPUT Title_Level;
+ANALOG_OUTPUT Chapter_Number;
+ANALOG_OUTPUT Chapter_Length;
+ANALOG_OUTPUT Chapter_Location;
+ANALOG_OUTPUT Chapter_Remaining;
+ANALOG_OUTPUT Chapter_Level;
+
+ANALOG_OUTPUT Movie_Location;
+
+STRING_OUTPUT Title_Name;
+ANALOG_OUTPUT OSD_Screen;
+ANALOG_OUTPUT OSD_Popup;
+ANALOG_OUTPUT OSD_Dialog;
+DIGITAL_OUTPUT OSD_Saver;
+
+ANALOG_OUTPUT Image_Aspect_Ratio;
+ANALOG_OUTPUT Frame_Aspect_Ratio;
+
+ANALOG_OUTPUT Mask_Data;
+ANALOG_OUTPUT Mask_Conservative;
+
+ANALOG_OUTPUT Protocol_Version;
+
+ANALOG_OUTPUT User_Input;
+STRING_OUTPUT User_Input_Prompt;
+STRING_OUTPUT User_Input_Text;
+
+ANALOG_OUTPUT Mask_Abs_Top;
+ANALOG_OUTPUT Mask_Abs_Bottom;
+
+DIGITAL_OUTPUT Camera_Angles_Available;
+ANALOG_OUTPUT  Current_Camera_Angle;
+ANALOG_OUTPUT  Num_Camera_Angles;
+
+ANALOG_OUTPUT Video_Mode_Composite;
+ANALOG_OUTPUT Video_Mode_Component;
+ANALOG_OUTPUT Video_Mode_HDMI;
+
+STRING_OUTPUT User_Defined_Event;
+
+STRING_OUTPUT Friendly_Name;
+
+
+/*******************************************************************************************
+  Structure Definitions
+  Note:  Be sure to initialize all declared STRING variables as needed
+         For example, in Function Main: struct.myString = "";
+*******************************************************************************************/
+// None
+
+/*******************************************************************************************
+  Global Variables
+*******************************************************************************************/
+integer Touch_X_Changed;
+integer Touch_Y_Changed;
+integer Resetting_Interface;
+integer Player_Initialized;
+string Module_Description[100];
+
+/*******************************************************************************************
+  Functions
+*******************************************************************************************/
+Function Send(string data)  {
+	string data_out[MAX_MESSAGE_LENGTH];
+	
+	MakeString(data_out,"%02d/1/%s\n", Player_Id, data);
+	
+	#IF_DEFINED DEBUG
+	print("Sending:  %s",data_out);
+	#ENDIF
+	
+	Tx$ = data_out;
+}
+    
+    
+Function Send_Initialize()  {
+	
+	Send("GET_DEVICE_INFO:");	
+}
+
+
+Function Startup_Status()	{
+	string command[MAX_MESSAGE_LENGTH];
+
+	makestring(command,"SEND_TO_SYSLOG:INFORMATION:%s:",Module_Description);
+	Send(command);
+	
+	if(Direct_Connect = off && Player_Id != 1)  {				//if we're not local
+		Tx$ = "01/2/ENABLE_EVENTS:" + itoa(Player_Id) + ":\n";	//enable events for the device
+		delay(500);												//delay a few seconds for the response
+	}
+		//Retreive current status
+	Send("GET_MOVIE_LOCATION:");
+	Send("GET_PLAY_STATUS:");
+	Send("GET_PLAYING_TITLE_NAME:");
+	Send("GET_UI_STATE:");
+	Send("GET_VIDEO_MODE:");
+	Send("GET_FRIENDLY_NAME:");
+		
+	if(Using_Masking = 1)	{
+		Send("SET_SCREEN_MASK:1:");
+	}
+	
+	Send("GET_PROTOCOL:");
+
+}
+
+
+Function Reset_Interface()  {
+	if(Resetting_Interface = 1) return;		//if already resetting the interface, exit immediately
+	Resetting_Interface = 1;				//set the flag to prevent this function from re-entering
+	
+	Player_Initialized = 0;					//clear the initialized flag
+    while(Player_Initialized = 0)	{		//Keep trying until we initialize 
+		Send_Initialize();    				//send initialization
+	    delay(1000);						//wait to see if this worked
+	}
+	
+	Resetting_Interface = 0;				//clear the flag to allow this function to run again
+	
+}
+
+//       Kaleidescape responses and events have this format:
+//    
+//           01/1/000:COMMAND:ARG1:ARG2:ARG3:/28 
+//           
+//       where:
+//       
+//           01 is the device ID 
+//           1 is the sequence number (the same one we sent it in the command)
+//           000 is the status (000 means "success", anything else is an error)
+//           COMMAND identifies the kind of data being sent to us
+//           ARGn are the arguments of the command
+//           28 is the checksum of the message (always two digits)   
+//           
+//       So we will parse the response from the beginning to the end.
+//       Since we may be dealing with a serial connection, we must assume
+//       that this buffer may have been corrupted in transit.  We must be
+//       very careful to check that the syntax of the response is valid.
+//       (This is not really necessary when using TCP/IP since the TCP 
+//       layer ensures this for us.)
+
+
+//  Validate that the message is valid
+//  used by the Parse_Message function
+//  Returns 0 if invalid message, 1 otherwise
+Integer_Function Valid_Message(string message)  {
+	integer calculated_checksum;
+	integer response_checksum;
+	integer index;
+	integer message_id;
+	
+    // The shortest response is "01/1/000:/xx", so if we have something
+    // shorter than that, then we can just ignore it since we know it's
+    // corrupted.
+    if (len(message) < 12)  {
+    	#IF_DEFINED DEBUG
+        print ("Response too short: %s\n",message);
+        #ENDIF
+        return(0);
+    }
+
+    // Check that the first two characters are digits, then a slash, then
+    // one digit or !, then a slash.  Also third-to-last character must be a slash.
+    if (byte(message,1) < '0' || byte(message,1) > '9' ||
+        byte(message,2) < '0' || byte(message,2) > '9' ||
+        byte(message,3) != BACKSLASH ||
+        ((byte(message,4) < '0' || byte(message,4) > '9') && byte(message,4) != '!') ||
+        byte(message,5) != BACKSLASH ||
+        byte(message,len(message)-2) != BACKSLASH)
+    {
+    	print("Kaleidescape Player ID %d:  Received garbled message.\n    message is: %s\n",Player_ID, message);
+        return(0);
+    }
+
+    message_id = atoi(left(message,2));
+          
+    // Check that this response is from the device we want to talk to.
+    if(Direct_Connect = off)  {
+    	if(message_id != Player_Id)  {
+	    	#IF_DEFINED DEBUG
+	    	print("Bad Address: %d   My Address: %d\n",message_id, Player_Id);
+	    	#ENDIF
+	    	return(0);									//indicate that the message is not OK (not to us)
+	    }	
+    }
+    else  {	//we are directly connected
+    	if(message_id != 1 && message_id != Player_Id)  {	//if the message ID doesn't match and isn't 1
+	    	#IF_DEFINED DEBUG
+	    	print("Bad Address: %d   My Address: %d\n",message_id, Player_Id);
+	    	#ENDIF
+	    	return(0);									//indicate that the message is not OK (not to us)
+	    }
+    }
+      
+      
+    // Calculate the checksum and verify it.
+    calculated_checksum = 0;
+    for(index = 1 to (len(message) -2) )  {  // skip last two characters, that's the checksum itself.
+        calculated_checksum = calculated_checksum + byte(message,index);
+    }
+    calculated_checksum = calculated_checksum mod 100;
+    response_checksum = atoi(right(message,2));
+    if (calculated_checksum != response_checksum)  {
+    	#IF_DEFINED DEBUG
+    	print("Bad checksum: %d vs %d\n",calculated_checksum,response_checksum);
+    	#ENDIF
+        return(0);
+    }
+    
+    return(1);   
+}
+	
+//Remove and return a single field from the message.
+//Used by the Parse_Message function.
+String_Function Extract_Field(string message)  {
+	integer character;
+	integer escaped;
+	string response[MAX_RESPONSE_ARG_LEN];
+	
+	escaped = 0;		// initialize the variable
+	
+	while (len(message) > 0)  { // step through each byte
+	
+        //Character being examined
+        character = GetC(message);
+        
+        if (escaped = 1) {
+            // The previous character was a backslash, treat this character specially.
+            switch (character)  {
+                case ('d'):  {
+                    // The following three digits make up the character.
+                    character = (getC(message) - '0') * 100;
+                    character = character + (getC(message) - '0') * 10;
+                    character = character + (getC(message) - '0');
+                }
+                case ('t'):  {
+                    character = TAB;
+                }
+                case ('n'):  {
+                    character = LF;
+                }
+                case ('r'):  {
+                    character = CR;
+                }
+                default:   {
+                    // All other characters are simply themselves, nothing to do here.
+                }
+            }
+
+            // Append character to the response
+            if(len(response) < MAX_RESPONSE_ARG_LEN)
+	            response = response + chr(character);
+
+            // The escape only applies to the next character.  After that we're back to normal.
+            escaped = 0;
+        }
+        else  {	// here if escaped is 0
+            switch (character)  {
+                case (ESCSLASH):  {
+                    // Treat the next character specially.
+                    escaped = 1;
+                }
+                case (':'):  {
+                    // Colons separate fields, so finish this field.
+                    return(response);
+                }
+                default:   {
+                    // Normal character, append it.
+    		        if(len(response) < MAX_RESPONSE_ARG_LEN)
+                   		response = response + chr(character);
+                }                    
+            }		//switch
+        }			//else
+    }				//while
+    #IF_DEFINED DEBUG
+    print("Kaleidescape field contains no terminating colon.\n  Response is: \"%s\"\n", response);
+    #ENDIF
+    return(response);
+}					//function
+   
+   
+Function Player_Error(integer error_code)  {
+	string description[30];
+	
+	switch(error_code)  {
+		case(1):  {
+			description =  "Message too long.";
+		}
+		case(2):  {
+			description =  "Message contains invalid character.";
+		}
+		case(3):  {
+			description =  "Checksum error.";
+		}
+		case(4):  {
+			description =  "Invalid device.";
+		}
+		case(5):  {
+			description =  "Device unavailable.";
+		}
+		case(10):  {
+			description =  "Invalid request.";
+		}
+		case(11):  {
+			description =  "Invalid number of parameters.";
+		}
+		case(12):  {
+			description =  "Invalid parameter.";
+		}
+		case(13):  {
+			description =  "Device identifier conflict.";
+		}
+		case(14):  {
+			description =  "Invalid sequence number.";
+		}
+		case(999):  {
+			description =  "Undetermined error.";
+		}
+		default:  {
+			description =  "Unknown error.";
+		}
+	}
+	
+		//send error text to console
+	print("Kaleidescape Device ID %d: Error %03d - %s\n", Player_Id, error_code, description);
+}
+
+
+Function Device_Type_Check(integer Device_Type)	{
+	string Type_Text[30];
+	
+	switch(Device_Type)	{
+		case(1):	{
+			Type_Text = "a Server";
+		}
+		
+		case(2):	{
+			Type_Text = "a Player";
+			Startup_Status();		//call the startup status
+			return;					//halt execution of this function
+		}
+		
+		case(3):	{
+			Type_Text = "a DVD Reader";
+		}
+		
+		default:	{
+			Type_Text = "an unknown device";
+		}
+	}
+	
+	//if control falls here, we are not talking to a player.
+	
+	print("\nKaleidescape Device ID %d is %s, not a Player.\nThe Kaleidescape module only controls a Kaleidescape Player.\n\n", Player_ID, Type_Text);
+	
+}   
+   
+//Parse the string within "message" and process   
+Function Parse_Message(string message) {
+	integer length;		// keep track of the length of the message
+	integer num_args;	// the number of args
+	string  args[MAX_RESPONSE_ARGS][MAX_RESPONSE_ARG_LEN];	// the args within the message
+	
+	
+	length = len(message);
+    
+    // Remove trailing carriage return and/or linefeed
+    while (length > 0 && (byte(message,length) = CR || byte(message,length) = LF)) {
+        length = length - 1;
+    }
+	
+	message = left(message, length);
+	
+	//trap the PLAYER_RESTART even if the message isn't addressed to us, and if it lacks the leading 000:
+	if(  find("/!/PLAYER_RESTART:/",message)     ||
+	     find("/!/000:PLAYER_RESTART:/",message)    )  {
+	     
+		Reset_Interface();		//indicate that the player isn't yet initialized
+		return;
+	}
+		
+	
+    if (!Valid_Message(message))			//determine if the message is valid
+    	return;
+    
+    	
+	#IF_DEFINED DEBUG
+	print("Received:  %s\n",message);
+	#ENDIF
+
+    
+    message = right(message,len(message)-5);	//strip off the header
+    message = left(message,len(message)-3); 	//strip off the checksum
+    
+    num_args = 0;
+    while(len(message) && num_args<MAX_RESPONSE_ARGS)  {	//while there's a field in the message, and enough room in our response array
+    	args[num_args] = Extract_Field(message);			//remove it and put in in the array
+    	num_args = num_args + 1;							//indicate where to store the next arg (and the amount we've collected)
+    }
+        	
+	#IF_DEFINED DEBUG
+	if(len(message) > 0)
+		print("Additional unprocessed data:  \"%s\"\n",message);
+	#ENDIF
+    
+    if(!(args[0] = "000"))  {				//if there is an error condition noted by the player
+    	Player_Error(atoi(args[0]));		//pass the error code to the error handler
+    	return;								//halt processing
+   	}
+    	
+    if(num_args = 1)  {						//if the return code is the only thing the player is sending
+    	return;								//we're done.
+   	}						
+    
+    if(args[1] = "PLAY_STATUS")  {
+    	Play_Mode        = atoi(args[2]);
+    	//Speed is              args[3]
+    	//Title Number is       args[4]
+    	Title_Length     = atoi(args[5]);
+    	Title_Location   = atoi(args[6]);
+    	Chapter_Number   = atoi(args[7]); 
+    	Chapter_Length   = atoi(args[8]); 
+    	Chapter_Location = atoi(args[9]);
+    	
+    	if(Title_Length <> 0)										//prevent div by 0 errors
+	    	Title_Level = Title_Location * 65535 / Title_Length;		//calculate level of current title
+	    else
+	    	Title_Level = 0;
+	    	
+	    if(Chapter_Length <> 0)										//prevent div by 0 errors
+	    	Chapter_Level = Chapter_Location * 65535 / Chapter_Length; 	//calculate level of current chapter
+	    else
+	    	Chapter_Level = 0;
+    	
+    	Title_Remaining = Title_Length - Title_Location;			//calculate title time remaining
+    	Chapter_Remaining = Chapter_Length - Chapter_Location;		//calculate chapter time remaining
+    	return;
+   	}
+    	
+    if(args[1] = "SCREEN_MASK")  {
+    	Mask_Data         = atoi(args[2]);
+    	//top_trim_rel        is args[3]
+    	//bottom_trim_rel     is args[4]
+    	Mask_Conservative = atoi(args[5]);
+    	Mask_Abs_Top      = atoi(args[6]);	//convert to analog percentage
+    	Mask_Abs_Bottom   = atoi(args[7]);	//convert to analog percentage
+    	return;
+   	}
+    	
+    if(args[1] = "TITLE_NAME")  {
+    	Title_Name = args[2];
+    	return;
+   	}
+    	
+    if(args[1] = "UI_STATE")  {
+    	OSD_Screen = atoi(args[2]);
+    	OSD_Popup  = atoi(args[3]);
+    	OSD_Dialog = atoi(args[4]);
+    	if(args[5] = "1")
+	    	OSD_Saver = on;
+	    else
+	    	OSD_Saver = off;
+	    return;
+	}
+
+    if(args[1] = "MOVIE_LOCATION")  {
+    	Movie_Location = atoi(args[2]);
+    	return;
+   	}
+    	
+    if(args[1] = "ASPECT_RATIO")  {
+    	Image_Aspect_Ratio = atoi(args[2]);
+    	Frame_Aspect_Ratio = atoi(args[3]);
+    	return;
+   	}
+  
+  	if(args[1] = "DEVICE_INFO")	{				//what type of device are we talking to (sanity check)
+  		Device_Type_Check(atoi(args[2]));
+  		//args[3] = device serial number
+  		//args[4] = device ID
+  		//args[5] = device IP address
+  	}
+  	
+	if(args[1] = "PROTOCOL")	{
+		Protocol_Version = atoi(args[2]);		//indicate the protocol version number
+		Player_Initialized=1;					//indicate that we've successfully initialized the player
+	}
+	
+	if(args[1] = "USER_INPUT")	{
+		User_Input   = atoi(args[2]);			//1=keyboard, 2=keypad
+		
+		if(len(args[3]) = 0)					//if this is an empty string
+			args[3] = " ";						//make it acceptable for TPs
+		User_Input_Prompt = args[3];			//the current prompt
+		
+		if(len(args[4]) = 0)					//if this is an empty string
+			args[4] = " ";						//make it acceptable for TPs
+		User_Input_Text   = args[4];			//text that the user has typed
+	}
+	
+	if(args[1] = "CAMERA_ANGLE")  {
+		Current_Camera_Angle = atoi(args[2]);
+		Num_Camera_Angles    = atoi(args[3]);
+		
+		if(args[4] = "0")
+			Camera_Angles_Available = off;
+		else
+			Camera_Angles_Available = on;
+	}
+ 
+ 
+    if(args[1] = "VIDEO_MODE")  {
+    	Video_Mode_Composite = atoi(args[2]);
+    	Video_Mode_Component = atoi(args[3]);
+    	Video_Mode_HDMI      = atoi(args[4]);
+    }
+    
+    
+    if(args[1] = "USER_DEFINED_EVENT")  {
+    	User_Defined_Event = args[2];
+    	delay(1);
+    	User_Defined_Event = "";
+    }
+    
+    
+    if(args[1] = "FRIENDLY_NAME")	{
+    	Friendly_Name = args[2];
+    }
+ 
+}
+
+/*******************************************************************************************
+  Event Handlers
+*******************************************************************************************/
+
+CHANGE Rx$ {
+	string message[MAX_MESSAGE_LENGTH];	// temporary variable to hold individual message
+	
+	//   The Kaleidescape sends its commands terminated with CR/LF.  So
+    //   we shouldn't process anything until there's a linefeed ($0A) in
+    //   the buffer, otherwise we might try to process a partial command.
+    //   Also, after processing the command, remove it from the buffer
+    //   and keep going until there are no more linefeeds.
+
+	while( find("\n",Rx$) )	 { // while there is a CR/LF pair
+		message = remove("\n", Rx$);	// remove individual message
+		call Parse_Message(message);	// parse that message
+	}
+}
+
+
+CHANGE Command_To_Player  {
+	string command[MAX_MESSAGE_LENGTH];
+	command = Command_To_Player + ":";	//can't pass the STRING_INPUT by reference
+	Send(command);
+}
+              
+              
+CHANGE Keyboard_Input  {
+	integer key;
+	string escape[1];
+	string command[MAX_MESSAGE_LENGTH];
+	
+	while(len(Keyboard_Input))  {	//step through all input on this serial line
+		key = getC(Keyboard_Input);			//pull out 1 char at a time
+		escape = "";							//reset the escape string
+		if((key = BACKSLASH) ||				//if the key needs to be escaped
+		   (key = ':') ||
+		   (key = '/') )
+			{escape = chr(BACKSLASH);}		//set the escape string
+		
+		MakeString(command,"KEYBOARD_CHARACTER:%s%c:", escape, key);	//build the keyboard string
+		Send(command);						//send the command
+	}
+}
+  
+  
+/*
+The general concept of the touch interface is that the player only needs to coordinates of the selected
+area.  Since the same touch panel will provide the three events (X, Y, and Press) in various orders 
+arriving at various times, the following code turns these three events into a single POSITION_SELECT.
+
+We are given 3 events:  Touch_Channel press, Touch_X change and Touch_Y change.
+
+Touch_X maintains Touch_X_Changed, sets it to >0 if Touch_X data is fresh, and sets it to 0 if 
+Touch_X data becomes old.
+
+Touch_Y maintains Touch_Y_Changed, sets it to >0 if Touch_Y data is fresh, and sets it to 0 if 
+Touch_Y data becomes old.
+
+Touch_Channel waits for valid Touch_X and Touch_Y data (as reported by the Touch_?_Changed variables)
+then sends the POSITION_SELECT command.
+
+
+The Touch_X and Touch_Y change events maintain the global variables Touch_X_Changed and Touch_Y_Changed.  
+These variables increment on each trigger of the event.  Each re-entrant change event waits for 2/10 of 
+a second and checks to see if their my_change value is equal to the global variable, and if it is, they 
+expire the global variable by setting it to 0.  This allows the Touch_Channel press event to monitor
+the global variables to determine that fresh data is available in Touch_X and Touch_Y, and to wait if 
+it isn't available.
+
+*/
+PUSH Touch_Channel  {
+	integer timeout;
+	string command[MAX_MESSAGE_LENGTH];
+	
+	#IF_DEFINED DEBUG
+	print(" Received Push.  X_Change = %d, Y_Change = %d, X:%u, Y:%u\n", Touch_X_Changed, Touch_Y_Changed, Touch_X, Touch_Y);
+	#ENDIF
+	
+	timeout = 0;
+	delay(1);
+	while( ( (Touch_X_Changed = 0) || (Touch_Y_Changed = 0) ) && timeout < 20 )	//if we don't have changed coords
+		{
+		delay(1);								//pause a split second to ensure we have good XY coords
+		timeout = timeout + 1;					//count up the timeout
+		}
+		
+	#IF_DEFINED DEBUG		
+	print("Sending Push.  X_Change = %d, Y_Change = %d, X:%u, Y:%u (timeout=%d)\n", Touch_X_Changed, Touch_Y_Changed, Touch_X, Touch_Y,timeout);
+	#ENDIF
+	
+	if(Touch_X_Changed = 0)	{
+		print("Kaleidescape Module Error.  Touch press timeout with no touch coordinate X.\n");
+		}
+		
+	if(Touch_Y_Changed = 0)	{
+		print("Kaleidescape Module Error.  Touch press timeout with no touch coordinate Y.\n");
+		}
+	
+	makestring( command, "POSITION_SELECT:%u:%u:", Touch_X, Touch_Y );		//create the command
+	Send(command);							//send the command
+	}
+	
+	//set these flags when the level data changes
+CHANGE Touch_X  {
+	integer my_change;
+	
+	#IF_DEFINED DEBUG
+	print(" Received X:%u\n",Touch_X);
+	#ENDIF
+	
+	Touch_X_Changed = Touch_X_Changed+1;	//increment the flag
+	if(Touch_X_Changed > 65530) Touch_X_Changed = 1;		//if we close to rolling, set back to 1
+	
+	my_change = Touch_X_Changed;			//remember where we left it
+	delay(20);								//pause a 2/10 of a sec
+	if(my_change = Touch_X_Changed)			//if the last change was ours
+		{
+		Touch_X_Changed = 0;				//expire it!
+		
+		#IF_DEFINED DEBUG
+		print(" X expired.  my_change=%d\n",my_change);
+		#ENDIF
+		}
+	}
+	
+CHANGE Touch_Y  {
+	integer my_change;
+	
+	#IF_DEFINED DEBUG
+	print(" Received Y:%u\n",Touch_Y);
+	#ENDIF
+	
+	Touch_Y_Changed = Touch_Y_Changed+1;	//increment the flag
+	if(Touch_Y_Changed > 65530) Touch_Y_Changed = 1;		//if we close to rolling, set back to 1
+	
+	my_change = Touch_Y_Changed;			//remember where we left it
+	delay(20);								//pause a 2/10 of a sec
+	if(my_change = Touch_Y_Changed)			//if the last change was ours
+		{
+		Touch_Y_Changed = 0;				//expire it!
+		
+		#IF_DEFINED DEBUG
+		print(" Y expired.  my_change=%d\n",my_change);
+		#ENDIF
+		}
+	}
+	
+	
+CHANGE Play_Script	{
+	string command[MAX_MESSAGE_LENGTH];
+	
+	if(len(Play_Script) > 0)	{			//if the name is not null
+		command = "PLAY_SCRIPT:" + Play_Script + ":";	//build the command
+		Send(command);						//send the built command
+		Play_Script = "";					//blank the input to allow re-triggering the same name
+		}
+	}	
+	
+PUSH Connection_Reset	{
+	Reset_Interface();
+	}
+
+
+/*******************************************************************************************
+  Main()
+*******************************************************************************************/
+Function Main()
+{
+	MODULE_DESCRIPTION = "Kaleidescape Player Crestron Module v4.1  $Date: 2005/05/18 $ $Revision: #2 $";
+	
+    WaitForInitializationComplete();
+    
+    delay(500);							//wait an additional few seconds for ALL logic to be done propogating
+    
+    print("%s - Device ID %d\n",Module_Description, Player_ID);
+    
+	Reset_Interface();
+}
+
+

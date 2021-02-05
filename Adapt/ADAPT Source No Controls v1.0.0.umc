@@ -1,0 +1,142 @@
+[
+Version=1
+]
+[
+ObjTp=FSgntr
+Sgntr=UserMacro
+RelVrs=4.03.10
+IntStrVrs=2
+MinSMWVrs=3.00.00
+MinTIOVrs=0
+SavedBy=SMW4.02.50
+]
+[
+ObjTp=Hd
+S0Nd=1
+S1Nd=2
+SLNd=3
+PrNm=ADAPT Source No Controls v1.0.0.umc
+CmVr=3.03
+DbVr=52.00.016.00
+DvcDbVr=66.05.002.00
+PgmNm=ELD
+DlrNm=PanTech Design
+Incl=1766,2574,2651,2817,2886,2938,2947,3181,3197,3233,3710,3735,3736,3816,3888,4176,4308,4476,4591,4769,
+McNm=_PD_ Device CHV-TSTATEX v1
+SmVr=951
+DvVr=951
+TpN1=1
+TpN2=2
+TpN3=3
+TpN4=4
+TpN5=5
+PdfHelp=Adapt Reference Guide.pdf
+APg=1
+FltTmp=1
+FpCS=0
+EnType=2
+ZeroOnIoOk=0
+SGMethod=1
+]
+[
+ObjTp=Bk
+Nm1=\
+Sx1=0
+Sy1=0
+Mx1=0
+]
+[
+ObjTp=Bw
+H=1
+Lx=0
+Ly=0
+Rx=465
+Ry=1978
+Xm=-1
+Ym=-1
+SH=7
+Z=75
+Ht=1
+Hi=1
+]
+[
+ObjTp=Bw
+H=1
+Lx=465
+Ly=0
+Rx=930
+Ry=1978
+Xm=-1
+Ym=-1
+SH=8
+Z=75
+Ht=4
+Hi=10
+]
+[
+ObjTp=Bw
+H=1
+Lx=930
+Ly=0
+Rx=1395
+Ry=1978
+Xm=-1
+Ym=-1
+SH=6
+Z=75
+Ht=3
+Hi=5
+]
+[
+ObjTp=Symbol
+Name=ADAPT Source No Controls v1.0.0
+Code=1
+SmplCName=ADAPT Source No Controls v1.0.0.umc
+Smpl-C=3
+CompilerTimePrecision=Single_Or_Double_Precision
+Exclusions=1,19,20,21,88,89,167,168,179,216,225,248,249,266,302,305,213,214,215,217,226,267,310,362,378,380,405,407,408,409,478,522,537,554,586,590,611,624,718,756,767,830,841,842,854,883,955,1032,1062,1079,1128,1129,1134,1140,1157,1158,1195,1199,1220,1221,1222,1223,1299,1348,1349,1439,1472,1473,1499,1746,1803,1975,2229,2354,2514,2523,2532,2706,2707,3235,3236,3427,3454,3567,3568,3601,3602,3708,3902,3903,3912,3918,3925,3926,4206,4207,
+SMWRev=3.00.00
+TIORev=0
+S+=1
+HelpID=1055
+PdfHelp=Adapt Reference Guide.pdf
+APg=1
+StdCmd=0
+FltTmp=1
+FpCS=0
+NumFixedInputs=1
+NumFixedOutputs=1
+NumFixedParams=5
+MinVariableInputs=0
+MinVariableInputsList2=0
+MinVariableInputsList3=0
+MinVariableOutputs=0
+MinVariableOutputsList2=0
+MinVariableOutputsList3=0
+MinVariableParams=0
+SymbolTree=46
+UserSymTreeName=ADAPT Sources
+ParamSigType1=Constant
+ParamSigType2=String
+ParamSigType3=String
+ParamSigType4=String
+ParamSigType5=String
+InputCue1=INIT
+OutputCue1=[In_Use]
+ParamCue1=Source Number
+ParamCue2=Info Line 1
+ParamCue3=Info Line 2
+ParamCue4=Info Line 3
+ParamCue5=Info Line 4
+MPp=5
+Pp1=1
+Pp2=6
+Pp3=7
+Pp4=8
+Pp5=9
+FileName=ADAPT Source No Controls v1.0.0.umc
+EncodingType=2
+ZeroOnIoOk=0
+]
+FeSchVr=001
+¶¬ÊäæÒŞÜzbº¶ÄÔ¨àzŒ¦ÎÜèä¦ÎÜèäzªæÊäšÂÆäŞ¤ÊØ¬äæzh\`f\b`’Üè¦èä¬äæzdšÒÜ¦š®¬äæzf\<d:`>\<d:`>šÒÜ¨’¬äæz`¦ÂìÊÈ„òz¦š®h\`d\j`º¶ÄÔ¨àzÈ¦`œÈzb¦bœÈzd¦˜œÈzf äœÚz‚ˆ‚ ¨@¦ŞêäÆÊ@œŞ@†ŞÜèäŞØæ@ìb\`\`\êÚÆ†Ú¬äzf\`fˆÄ¬äzjd\<d:`>\`bl\<d:`>ˆìÆˆÄ¬äz<d:l>\`j\<d:`>d\<d:`> ÎÚœÚzŠ˜ˆˆØäœÚz ÂÜ¨ÊÆĞ@ˆÊæÒÎÜ’ÜÆØzbn<d:l>XdjnhXdljbXdpbnXd<d:p>lXdrfpXdrhnXfbpbXfbrnXfd<d:f>Xfnb`XfnfjXfnflXfpblXf<f:p>XhbnlXhf`pX<d:h>nlXhjrbXhnlrXšÆœÚz¾ ˆ¾@ˆÊìÒÆÊ@†¬Z¨¦¨‚¨Š°@ìb¦Ú¬äzrjbˆì¬äzrjb¨àœbzb¨àœdzd¨àœfzf¨àœhzh¨àœjzj ÈÌÊØàz‚ÈÂàè@¤ÊÌÊäÊÜÆÊ@êÒÈÊ\àÈÌ‚ ÎzbŒØè¨ÚàzbŒà†¦z`ŠÜ¨òàÊzd´ÊäŞÜ’ŞÖz`¦šÊèĞŞÈzbº¶ÄÔ¨àz„ÖœÚbz¸¦ğbz`¦òbz`šğbz`º¶ÄÔ¨àz„îzb˜ğz`˜òz`¤ğzhlj¤òzbrnp°ÚzZb²ÚzZb¦zn´znjèzbÒzbº¶ÄÔ¨àz„îzb˜ğzhlj˜òz`¤ğzrf`¤òzbrnp°ÚzZb²ÚzZb¦zp´znjèzhÒzb`º¶ÄÔ¨àz„îzb˜ğzrf`˜òz`¤ğzbfrj¤òzbrnp°ÚzZb²ÚzZb¦zl´znjèzfÒzjº¶ÄÔ¨àz¦òÚÄŞØœÂÚÊz‚ˆ‚ ¨@¦ŞêäÆÊ@œŞ@†ŞÜèäŞØæ@ìb\`\`†ŞÈÊzT  T¼ì˜ä„ÂTèTŠ  Tb¦ÚàØ†œÂÚÊz‚ˆ‚ ¨@¦ŞêäÆÊ@œŞ@†ŞÜèäŞØæ@ìb\`\`\êÚÆ¦ÚàØZ†zf†ŞÚàÒØÊä¨ÒÚÊ äÊÆÒæÒŞÜz¦ÒÜÎØÊ¾ä¾ˆŞêÄØÊ¾ äÊÆÒæÒŞÜŠğÆØêæÒŞÜæzbXbrXd`XdbX<d:p>XprXblnXblpXbnrXdblX<d:d>jXdhpXdhrXd<d:l>Xf`dXf`jXdbfXdbhXdbjXdbnX<d:d>lXdlnXfb`XfldXfnpXfp`Xh`jXh`nXh`pXh`rXhnpXj<d:d>XjfnX<d:j>hXjplXjr`Xl<d:b>XldhXnbpXnjlXnlnXpf`XphbXphdXpjhX<d:p>fXr<d:j>Xb`fdXb`ldXb`nrX<d:b>dpX<d:b>drX<d:b>fhX<d:b>h`X<d:b>jnX<d:b>jpX<d:b>rjX<d:b><d:r>Xb<d:d>`Xb<d:d>bXb<f:d>Xb<d:d>fXbd<d:r>XbfhpXbfhrXbhfrXbhndXbhnfXbh<d:r>XbnhlXbp`fXbrnjX<f:d>rXdfjhXdjbhXdjdfXdjfdXdn`lXdn`nXfdfjXfdflXfhdnXfhjhXfjlnXfjlpXfl`bXfl`dXfn`pXfr`dXfr`fXfrbdXfrbpXfrdjXfrdlXhd`lXhd`nX¦š®¤Êìzf\<d:`>\<d:`>¨’¤Êìz`¦VzbÊØà’ˆzb`<d:j> ÈÌÊØàz‚ÈÂàè@¤ÊÌÊäÊÜÆÊ@êÒÈÊ\àÈÌ‚ Îzb¦èÈ†ÚÈz`ŒØè¨ÚàzbŒà†¦z`œêÚŒÒğÊÈ’ÜàêèæzbœêÚŒÒğÊÈêèàêèæzbœêÚŒÒğÊÈ ÂäÂÚæzjšÒÜ¬ÂäÒÂÄØÊ’Üàêèæz`šÒÜ¬ÂäÒÂÄØÊ’Üàêèæ˜Òæèdz`šÒÜ¬ÂäÒÂÄØÊ’Üàêèæ˜Òæèfz`šÒÜ¬ÂäÒÂÄØÊêèàêèæz`šÒÜ¬ÂäÒÂÄØÊêèàêèæ˜Òæèdz`šÒÜ¬ÂäÒÂÄØÊêèàêèæ˜Òæèfz`šÒÜ¬ÂäÒÂÄØÊ ÂäÂÚæz`¦òÚÄŞØ¨ä<d:Ê>zhlªæÊä¦òÚ¨ä<d:Ê>œÂÚÊz‚ˆ‚ ¨@¦ŞêäÆÊæ ÂäÂÚ¦ÒÎ¨òàÊbz†ŞÜæèÂÜè ÂäÂÚ¦ÒÎ¨òàÊdz¦èäÒÜÎ ÂäÂÚ¦ÒÎ¨òàÊfz¦èäÒÜÎ ÂäÂÚ¦ÒÎ¨òàÊhz¦èäÒÜÎ ÂäÂÚ¦ÒÎ¨òàÊjz¦èäÒÜÎ’Üàêè†êÊbz’œ’¨êèàêè†êÊbz¶’Ü¾ªæÊº ÂäÂÚ†êÊbz¦ŞêäÆÊ@œêÚÄÊä ÂäÂÚ†êÊdz’ÜÌŞ@˜ÒÜÊ@b ÂäÂÚ†êÊfz’ÜÌŞ@˜ÒÜÊ@d ÂäÂÚ†êÊhz’ÜÌŞ@˜ÒÜÊ@f ÂäÂÚ†êÊjz’ÜÌŞ@˜ÒÜÊ@hš àzj àbzb àdzl àfzn àhzp àjzrŒÒØÊœÂÚÊz‚ˆ‚ ¨@¦ŞêäÆÊ@œŞ@†ŞÜèäŞØæ@ìb\`\`\êÚÆŠÜÆŞÈÒÜÎ¨òàÊzd´ÊäŞÜ’ŞÖz`º¶ÄÔ¨àz¦Úzb¦Ú†zbjnœÚz†ÊÜèäÂØ@†ŞÜèäŞØ@šŞÈêØÊæÄÔ¬Êäzb†ŒzdÜb’zbÜbzbÚ’zbÚzbèzbÚ zb bzº¶ÄÔ¨àz¦Úzd¦Ú†zbjnœÚzœÊèîŞäÖ@šŞÈêØÊæÄÔ¬Êäzb†ŒzdÜb’zbÜbzbÚ’zbÚzbèzbÚ zb bzº¶ÄÔ¨àz¦Úzf¦Ú†zbjnœÚzŠèĞÊäÜÊèÄÔ¬Êäzb†ŒzdÜb’zbÜbzbÚ’zbÚzbèzbÚ zb bzº¶ÄÔ¨àz¦Úzh¦Ú†zbjlœÚz˜ŞÎÒÆÄÔ¬Êäzb†ŒzdÚ†zd†bzp†dznº¶ÄÔ¨àz¦Úzj¦Ú†zbjnœÚzˆÊÌÒÜÊ‚äÎêÚÊÜèæÄÔ¬Êäzb†ŒzdÜb’zbÜbzbÚ†zb†bzlÚ’zbÚzbèzbÚ zb bzº¶ÄÔ¨àz¦Úzl¦Ú†z<d:j>œÚz‚äÎêÚÊÜè@ˆÊÌÒÜÒèÒŞÜÄÔ¬Êäzb äzj†ŒzdÜb’zbÜbzbÚ’zb’bzhÚzbèzbbzjÚ zj bz¦ŞêäÆÊ@œêÚÄÊä dz’ÜÌŞ@˜ÒÜÊ@b fz’ÜÌŞ@˜ÒÜÊ@d hz’ÜÌŞ@˜ÒÜÊ@f jz’ÜÌŞ@˜ÒÜÊ@hš àzj àbzb àdzl àfzn àhzp àjzrº¶ÄÔ¨àz¦Úzn¦Ú†zbh<d:n>œÚzšêØèÒàØÊ@¦ÊäÒÂØ@¦ÊÜÈÄÔ¬Êäzb äzh†ŒzdÜb’zbÜbzh†ÚÜbz’ÜÌŞ@¨Êğè<d:¸>Ú’zb’bzhÚzhèzhbzldznfzphzrÚ zh bzF’ÜÌŞ@˜ÒÜÊ@b dzF’ÜÌŞ@˜ÒÜÊ@d fzF’ÜÌŞ@˜ÒÜÊ@f hzF’ÜÌŞ@˜ÒÜÊ@hº¶ÄÔ¨àz¦Úzp¦Ú†zb`fœÚz¾‚¦¾@¦ŞêäÆÊœŞ†ŞÜèäŞØæ@ìb\`\`\êæàÄÔ¬Êäzb äzh†ŒzdÜb’zbfÜd’zhÜbzb`Ú’zbn’b`zh’<d:b>zbd<d:b>’bdzbd<d:b>’bhzl’bjzn’blzp’bnzrÚzb`èzb`b`zjÚ zb` bz dzF¦ŞêäÆÊ@œêÚÄÊä fz¦ŞêäÆÊ hz`È jz<d:D> lzÀ nz`È pz`È rz`È b`z`Èº¶ÄÔ¨àz¦ÎzhœÚz’œ’¨º¶ÄÔ¨àz¦ÎzjœÚz¶’Ü¾ªæÊºº¶ÄÔ¨àz¦ÎzlœÚz’ÜÌŞ¾˜ÒÜÊb¦Î¨àzhº¶ÄÔ¨àz¦ÎznœÚz’ÜÌŞ¾˜ÒÜÊd¦Î¨àzhº¶ÄÔ¨àz¦ÎzpœÚz’ÜÌŞ¾˜ÒÜÊf¦Î¨àzhº¶ÄÔ¨àz¦ÎzrœÚz’ÜÌŞ¾˜ÒÜÊh¦Î¨àzhº¶ÄÔ¨àz¦Îzbd<d:b>œÚz<d:^><d:¾>ÈÒÎÒèÂØ¾äÊæÊäìÊÈ<d:¾>º¶ÄÔ¨àzˆàzb¨àzbœŒzfˆœŒzbŠÜÆŒÚèz`ˆ¬˜Œzb¦ÎÜz`º¶ÄÔ¨àzˆàzl¨àzbœŞ¦zŒ‚˜¦ŠŠÜÆŒÚèz`ˆ¬˜Œzb¦ÎÜz`º¶ÄÔ¨àzˆàzn¨àzbœŞ¦zŒ‚˜¦ŠŠÜÆŒÚèz`ˆ¬˜Œzb¦ÎÜz`º¶ÄÔ¨àzˆàzp¨àzbœŞ¦zŒ‚˜¦ŠŠÜÆŒÚèz`ˆ¬˜Œzb¦ÎÜz`º¶ÄÔ¨àzˆàzr¨àzbœŞ¦zŒ‚˜¦ŠŠÜÆŒÚèz`ˆ¬˜Œzb¦ÎÜz`º
