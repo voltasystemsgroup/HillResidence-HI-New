@@ -1,0 +1,99 @@
+[BEGIN]
+  Version=1
+[END]
+[BEGIN]
+  ObjTp=FSgntr
+  Sgntr=UserSPlus
+  RelVrs=1
+  IntStrVrs=1
+  SPlusVrs=4.04.01
+  CrossCplrVrs=1.3
+[END]
+[BEGIN]
+  ObjTp=Hd
+  Cmn1=	For use inside the Honeywell 4232CBM v1.4 module only.
+[END]
+[BEGIN]
+  ObjTp=Symbol
+  Exclusions=1,19,20,21,88,89,167,168,179,213,214,215,216,217,225,226,248,249,266,267,310,718,756,854,
+  Exclusions_CDS=5
+  Inclusions_CDS=6
+  Name=Honeywell 4232CBM Processor v1.4
+  SmplCName=Honeywell 4232CBM Processor v1.4.usp
+  Code=1
+  SysRev5=4.006
+  SMWRev=3.00.00
+  InputCue1=Initialize
+  InputSigType1=Digital
+  InputCue2=enable_debugging
+  InputSigType2=Digital
+  InputCue3=Key[#]
+  InputSigType3=Digital
+  OutputCue1=Back_Light_On
+  OutputSigType1=Digital
+  OutputCue2=Receiving_Data
+  OutputSigType2=Digital
+  InputList2Cue1=System_Type
+  InputList2SigType1=Analog
+  InputList2Cue2=From_Device
+  InputList2SigType2=Serial
+  OutputList2Cue1=L1_Value
+  OutputList2SigType1=Analog
+  OutputList2Cue2=L2_Value
+  OutputList2SigType2=Analog
+  OutputList2Cue3=L3_Value
+  OutputList2SigType3=Analog
+  OutputList2Cue4=Line_1_Text
+  OutputList2SigType4=Serial
+  OutputList2Cue5=Line_2_Text
+  OutputList2SigType5=Serial
+  OutputList2Cue6=To_Device
+  OutputList2SigType6=Serial
+  ParamCue1=[Reference Name]
+  MinVariableInputs=3
+  MaxVariableInputs=22
+  MinVariableInputsList2=2
+  MaxVariableInputsList2=2
+  MinVariableOutputs=2
+  MaxVariableOutputs=2
+  MinVariableOutputsList2=6
+  MaxVariableOutputsList2=6
+  MinVariableParams=0
+  MaxVariableParams=0
+  Expand=expand_separately
+  Expand2=expand_separately
+  ProgramTree=Logic
+  SymbolTree=32
+  Hint=
+  PdfHelp=
+  HelpID= 
+  Render=4
+  Smpl-C=16
+  CompilerCode=-48
+  CompilerParamCode=27
+  CompilerParamCode5=14
+  NumFixedParams=1
+  Pp1=1
+  MPp=1
+  NVStorage=10
+  ParamSigType1=String
+  SmplCInputCue1=o#
+  SmplCOutputCue1=i#
+  SmplCInputList2Cue1=an#
+  SmplCOutputList2Cue1=ai#
+  SPlus2CompiledName=S2_Honeywell_4232CBM_Processor_v1_4
+  SymJam=NonExclusive
+  FileName=Honeywell 4232CBM Processor v1.4.ush
+  SIMPLPlusModuleEncoding=0
+  Usl1=_AS_ Constants.usl
+  clz1=AdaptCore
+  clz2=SonosLibrary_v3_1
+  clz3=SonosLibrary
+  clz4=AffinityClientConnection
+[END]
+[BEGIN]
+  ObjTp=Dp
+  H=1
+  Tp=1
+  NoS=False
+[END]

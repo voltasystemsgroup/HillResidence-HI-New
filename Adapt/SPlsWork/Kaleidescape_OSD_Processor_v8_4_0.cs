@@ -2833,11 +2833,11 @@ namespace UserModule_KALEIDESCAPE_OSD_PROCESSOR_V8_4_0
             __context__.SourceCodeLine = 2110;
             DETAILS_VISIBLE  .Value = (ushort) ( 0 ) ; 
             __context__.SourceCodeLine = 2111;
-            CreateWait ( "__SPLS_TMPVAR__WAITLABEL_8__" , 40 , __SPLS_TMPVAR__WAITLABEL_8___Callback ) ;
+            CreateWait ( "__SPLS_TMPVAR__WAITLABEL_2__" , 40 , __SPLS_TMPVAR__WAITLABEL_2___Callback ) ;
             
             }
             
-        public void __SPLS_TMPVAR__WAITLABEL_8___CallbackFn( object stateInfo )
+        public void __SPLS_TMPVAR__WAITLABEL_2___CallbackFn( object stateInfo )
         {
         
             try
@@ -2913,11 +2913,11 @@ namespace UserModule_KALEIDESCAPE_OSD_PROCESSOR_V8_4_0
         __context__.SourceCodeLine = 2152;
         _NOWPLAYINGHANDLE  .UpdateValue ( HANDLE  ) ; 
         __context__.SourceCodeLine = 2153;
-        CreateWait ( "__SPLS_TMPVAR__WAITLABEL_9__" , 40 , __SPLS_TMPVAR__WAITLABEL_9___Callback ) ;
+        CreateWait ( "__SPLS_TMPVAR__WAITLABEL_3__" , 40 , __SPLS_TMPVAR__WAITLABEL_3___Callback ) ;
         
         }
         
-    public void __SPLS_TMPVAR__WAITLABEL_9___CallbackFn( object stateInfo )
+    public void __SPLS_TMPVAR__WAITLABEL_3___CallbackFn( object stateInfo )
     {
     
         try
@@ -5680,8 +5680,8 @@ public override void LogosSplusInitialize()
     RX__DOLLAR__ = new Crestron.Logos.SplusObjects.BufferInput( RX__DOLLAR____AnalogSerialInput__, 8192, this );
     m_StringInputList.Add( RX__DOLLAR____AnalogSerialInput__, RX__DOLLAR__ );
     
-    __SPLS_TMPVAR__WAITLABEL_8___Callback = new WaitFunction( __SPLS_TMPVAR__WAITLABEL_8___CallbackFn );
-    __SPLS_TMPVAR__WAITLABEL_9___Callback = new WaitFunction( __SPLS_TMPVAR__WAITLABEL_9___CallbackFn );
+    __SPLS_TMPVAR__WAITLABEL_2___Callback = new WaitFunction( __SPLS_TMPVAR__WAITLABEL_2___CallbackFn );
+    __SPLS_TMPVAR__WAITLABEL_3___Callback = new WaitFunction( __SPLS_TMPVAR__WAITLABEL_3___CallbackFn );
     
     RX__DOLLAR__.OnSerialChange.Add( new InputChangeHandlerWrapper( RX__DOLLAR___OnChange_0, false ) );
     COMMAND_TO_PLAYER__DOLLAR__.OnSerialChange.Add( new InputChangeHandlerWrapper( COMMAND_TO_PLAYER__DOLLAR___OnChange_1, false ) );
@@ -5715,8 +5715,8 @@ public override void LogosSimplSharpInitialize()
 public UserModuleClass_KALEIDESCAPE_OSD_PROCESSOR_V8_4_0 ( string InstanceName, string ReferenceID, Crestron.Logos.SplusObjects.CrestronStringEncoding nEncodingType ) : base( InstanceName, ReferenceID, nEncodingType ) {}
 
 
-private WaitFunction __SPLS_TMPVAR__WAITLABEL_8___Callback;
-private WaitFunction __SPLS_TMPVAR__WAITLABEL_9___Callback;
+private WaitFunction __SPLS_TMPVAR__WAITLABEL_2___Callback;
+private WaitFunction __SPLS_TMPVAR__WAITLABEL_3___Callback;
 
 
 const uint TOUCH_CHANNEL__DigitalInput__ = 0;

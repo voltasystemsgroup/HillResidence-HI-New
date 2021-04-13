@@ -1,0 +1,176 @@
+#ifndef __S2_HONEYWELL_VISTA_128BPT_KEYPAD_PROCESSOR_PRODIGY_V1_0_H__
+#define __S2_HONEYWELL_VISTA_128BPT_KEYPAD_PROCESSOR_PRODIGY_V1_0_H__
+
+
+
+
+/*
+* Constructor and Destructor
+*/
+
+/*
+* DIGITAL_INPUT
+*/
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_PROCESS_FROM_DEVICE_DIG_INPUT 0
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_POLL_DIG_INPUT 1
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SEND_NEXT_IN_DIG_INPUT 2
+
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_KEYPAD_DIG_INPUT 3
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_KEYPAD_ARRAY_LENGTH 15
+
+/*
+* ANALOG_INPUT
+*/
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_PARTITION_NUMBER_ANALOG_INPUT 0
+
+
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_FROM_DEVICE_BUFFER_INPUT 1
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_FROM_DEVICE_BUFFER_MAX_LEN 1000
+CREATE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __FROM_DEVICE, __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_FROM_DEVICE_BUFFER_MAX_LEN );
+
+
+/*
+* DIGITAL_OUTPUT
+*/
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SEND_NEXT_OUT_DIG_OUTPUT 0
+
+
+/*
+* ANALOG_OUTPUT
+*/
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_LED_STATE_VALUE_ANALOG_OUTPUT 0
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_BACKLIGHT_MODE_VALUE_ANALOG_OUTPUT 1
+
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_TO_DEVICE_STRING_OUTPUT 2
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_KEYPAD_LINE_1_TEXT_STRING_OUTPUT 3
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_KEYPAD_LINE_2_TEXT_STRING_OUTPUT 4
+
+
+/*
+* Direct Socket Variables
+*/
+
+
+
+
+/*
+* INTEGER_PARAMETER
+*/
+/*
+* SIGNED_INTEGER_PARAMETER
+*/
+/*
+* LONG_INTEGER_PARAMETER
+*/
+/*
+* SIGNED_LONG_INTEGER_PARAMETER
+*/
+/*
+* INTEGER_PARAMETER
+*/
+/*
+* SIGNED_INTEGER_PARAMETER
+*/
+/*
+* LONG_INTEGER_PARAMETER
+*/
+/*
+* SIGNED_LONG_INTEGER_PARAMETER
+*/
+/*
+* STRING_PARAMETER
+*/
+
+
+/*
+* INTEGER
+*/
+
+
+/*
+* LONG_INTEGER
+*/
+
+
+/*
+* SIGNED_INTEGER
+*/
+
+
+/*
+* SIGNED_LONG_INTEGER
+*/
+
+
+/*
+* STRING
+*/
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_STEMP_STRING_MAX_LEN 100
+CREATE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __STEMP, __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_STEMP_STRING_MAX_LEN );
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SSTRING_STRING_MAX_LEN 5
+CREATE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SSTRING, __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SSTRING_STRING_MAX_LEN );
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SRECEIVE_STRING_MAX_LEN 250
+CREATE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SRECEIVE, __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SRECEIVE_STRING_MAX_LEN );
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_STEMPLINE1_STRING_MAX_LEN 16
+CREATE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __STEMPLINE1, __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_STEMPLINE1_STRING_MAX_LEN );
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_STEMPLINE2_STRING_MAX_LEN 16
+CREATE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __STEMPLINE2, __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_STEMPLINE2_STRING_MAX_LEN );
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SLINE1_STRING_MAX_LEN 16
+CREATE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SLINE1, __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SLINE1_STRING_MAX_LEN );
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SLINE2_STRING_MAX_LEN 16
+CREATE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SLINE2, __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SLINE2_STRING_MAX_LEN );
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SCOMMANDSENT_STRING_MAX_LEN 200
+CREATE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SCOMMANDSENT, __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SCOMMANDSENT_STRING_MAX_LEN );
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SPOLLQUEUE_ARRAY_NUM_ELEMS 50
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SPOLLQUEUE_ARRAY_NUM_CHARS 200
+CREATE_STRING_ARRAY( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SPOLLQUEUE, __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SPOLLQUEUE_ARRAY_NUM_ELEMS, __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SPOLLQUEUE_ARRAY_NUM_CHARS );
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SCOMMANDQUEUE_ARRAY_NUM_ELEMS 100
+#define __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SCOMMANDQUEUE_ARRAY_NUM_CHARS 200
+CREATE_STRING_ARRAY( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SCOMMANDQUEUE, __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SCOMMANDQUEUE_ARRAY_NUM_ELEMS, __S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0_SCOMMANDQUEUE_ARRAY_NUM_CHARS );
+
+/*
+* STRUCTURE
+*/
+
+START_GLOBAL_VAR_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0 )
+{
+   void* InstancePtr;
+   struct GenericOutputString_s sGenericOutStr;
+   unsigned short LastModifiedArrayIndex;
+
+   DECLARE_IO_ARRAY( __KEYPAD );
+   unsigned short __ITEMPKEY;
+   unsigned short __IFLAG1;
+   unsigned short __ITEMPBYTE;
+   unsigned short __IBACKLIGHT;
+   unsigned short __ICOMMON;
+   unsigned short __IOKTOSEND;
+   unsigned short __ICOMMANDNEXTSEND;
+   unsigned short __ICOMMANDNEXTSTORE;
+   unsigned short __IPOLLNEXTSEND;
+   unsigned short __IPOLLNEXTSTORE;
+   unsigned short __ISENDCOUNTER;
+   unsigned short __IKEYPARTSENT;
+   DECLARE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __STEMP );
+   DECLARE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SSTRING );
+   DECLARE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SRECEIVE );
+   DECLARE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __STEMPLINE1 );
+   DECLARE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __STEMPLINE2 );
+   DECLARE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SLINE1 );
+   DECLARE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SLINE2 );
+   DECLARE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SCOMMANDSENT );
+   DECLARE_STRING_ARRAY( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SPOLLQUEUE );
+   DECLARE_STRING_ARRAY( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __SCOMMANDQUEUE );
+   DECLARE_STRING_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, __FROM_DEVICE );
+};
+
+START_NVRAM_VAR_STRUCT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0 )
+{
+};
+
+DEFINE_WAITEVENT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, WTIMEOUT );
+DEFINE_WAITEVENT( S2_Honeywell_Vista_128BPT_Keypad_Processor_Prodigy_v1_0, WSENDTIMEOUT );
+
+
+#endif //__S2_HONEYWELL_VISTA_128BPT_KEYPAD_PROCESSOR_PRODIGY_V1_0_H__
+

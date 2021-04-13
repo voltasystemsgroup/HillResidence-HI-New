@@ -1,0 +1,324 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+ram              0x80000000         0x00500000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0x00000000                __DYNAMIC=0x0
+                0x00400000                PROVIDE (__stack, 0x400000)
+                0x00000000                PROVIDE (hardware_init_hook, 0x0)
+                0x00000000                PROVIDE (_hardware_init_hook, 0x0)
+                0x00000000                PROVIDE (software_init_hook, 0x0)
+                0x00000000                PROVIDE (_software_init_hook, 0x0)
+
+.text           0x80000000     0xb240
+ *(.text)
+ .text          0x80000000      0x92e S2_Honeywell_Vista_128FBP_250FBP_128BPE_250BPE_Event_Log_Driver_v4_1.o
+                0x80000840                S2_Honeywell_Vista_128FBP_250FBP_128BPE_250BPE_Event_Log_Driver_v4_1_main
+                0x80000784                S2_Honeywell_Vista_128FBP_250FBP_128BPE_250BPE_Event_Log_Driver_v4_1_EventHandler
+                0x80000536                S2_Honeywell_Vista_128FBP_250FBP_128BPE_250BPE_Event_Log_Driver_v4_1EventHandler00000
+ *fill*         0x8000092e        0x2
+ .text          0x80000930     0x1f20 S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1.o
+                0x80002808                S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1EventHandler00001
+                0x8000252e                S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1_main
+                0x8000176e                S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1EventHandler00003
+                0x800027bc                S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1WTIMEOUT
+                0x80000b12                S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1EventHandler00000
+                0x8000111c                S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1EventHandler00002
+                0x800019bc                S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1EventHandler00004
+                0x80002454                S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1_EventHandler
+ .text          0x80002850     0x1af4 S2_Honeywell_Vista_128FBP_250FBP_Keypad_Partition_v4_1.o
+                0x800031ec                S2_Honeywell_Vista_128FBP_250FBP_Keypad_Partition_v4_1EventHandler00002
+                0x80003df8                S2_Honeywell_Vista_128FBP_250FBP_Keypad_Partition_v4_1_EventHandler
+                0x800041ee                S2_Honeywell_Vista_128FBP_250FBP_Keypad_Partition_v4_1EventHandler00000
+                0x80002a32                S2_Honeywell_Vista_128FBP_250FBP_Keypad_Partition_v4_1EventHandler00001
+                0x8000422a                S2_Honeywell_Vista_128FBP_250FBP_Keypad_Partition_v4_1EventHandler00004
+                0x80003a10                S2_Honeywell_Vista_128FBP_250FBP_Keypad_Partition_v4_1EventHandler00003
+                0x80003eee                S2_Honeywell_Vista_128FBP_250FBP_Keypad_Partition_v4_1_main
+ .text          0x80004344     0x5836 library.o
+                0x80008530                RotateRightLong
+                0x80008b3e                IsSystem
+                0x80008494                Seed
+                0x80005d8c                Remove
+                0x80008110                Ltoa
+                0x80007e3c                Atoi
+                0x800071a4                InitRampInfoArray
+                0x800088ea                Right
+                0x8000991a                LockInputSema
+                0x800083be                Mod
+                0x800085a6                Getc
+                0x800082f2                SMuldiv
+                0x80008b20                IsHidden
+                0x800081d6                Min
+                0x8000972e                hextosi
+                0x80008cc4                WriteIntegerArray
+                0x8000923a                GetSignedIntArrayElementPtr
+                0x80007b5e                CheckStructArray
+                0x80009742                hextosl
+                0x80008e4a                WriteSignedIntegerArray
+                0x80007826                InitStringParamArray
+                0x80006af8                ReadSignedLongIntegerArray
+                0x80005a1a                GatherToDelimiter
+                0x8000764a                InitStringArray
+                0x800081b0                Max
+                0x80008b7a                IsReadOnly
+                0x800082ba                SMax
+                0x80005bbe                GatherByLength
+                0x8000804a                Chr
+                0x80008c9c                ReadSignedLongInteger
+                0x800080c8                Itohex
+                0x80007ad0                GetStructArrayElement
+                0x80007dc4                UNS_SetByte
+                0x800088be                ReverseFindi
+                0x80006fa0                ReadStringArray
+                0x8000904a                GetIntArrayElementPtr
+                0x800086fa                Lower
+                0x800084b0                RotateLeft
+                0x80009862                ResizeIfAutogrow
+                0x800072d0                CheckInputArray
+                0x800048b2                ResizeStringArray
+                0x80007fdc                Atosl
+                0x80007e04                High
+                0x80008460                Rnd
+                0x80008382                UMod
+                0x80008506                RotateLeftLong
+                0x8000998e                FindNumericChar
+                0x80009492                CheckIOArrayBounds2
+                0x80008ad8                MakeProgramFilename
+                0x800082d6                SMin
+                0x8000862e                Left
+                0x80008570                CheckBufferThreshold
+                0x80008c54                ReadSignedInteger
+                0x80007e2e                LowWord
+                0x80004344                Bit
+                0x80008c04                ReadLongInteger
+                0x80007c42                Byte
+                0x80009142                GetLongArrayElementPtr
+                0x80008890                ReverseFind
+                0x80008aee                GetSeries
+                0x80009a5a                InitTcpServer
+                0x800086e2                Len
+                0x80009562                InitializeRampInfoInternal
+                0x800081fc                Divide
+                0x80007f48                Atol
+                0x80008ae4                GetModelNumber
+                0x8000942a                CheckIOArrayBounds
+                0x8000732a                CheckStringInputArray
+                0x80008f0c                WriteSignedLongIntegerArray
+                0x80007a1a                GetStringArrayElement
+                0x80008154                Ltohex
+                0x80008080                Itoa
+                0x800084da                RotateRight
+                0x8000607a                InternalReverseFind
+                0x80008be4                WriteLongInteger
+                0x8000754e                InitDynamicStringStruct
+                0x80007440                SetStringArray
+                0x800068d6                ReadSignedIntegerArray
+                0x80007384                SetOutputArray
+                0x80008b94                WriteInteger
+                0x800079ae                InitStructDynamicArray
+                0x80006304                SetString
+                0x800083fa                Random
+                0x80008c2c                WriteSignedInteger
+                0x800045a8                Find
+                0x80008af8                GetProgramNumber
+                0x800087ce                Mid
+                0x800099cc                InitTcpClient
+                0x80005496                ResizeStructArray
+                0x80009332                GetSignedLongArrayElementPtr
+                0x80009754                hextol
+                0x80006d1a                ReadString
+                0x800076e0                InitDynamicStringArray
+                0x8000983a                UpperChar
+                0x80007ed8                Atosi
+                0x80008bbc                ReadInteger
+                0x8000826e                Muldiv
+                0x800073f2                SetStringOutputArray
+                0x80008fd0                WriteString
+                0x80004f0a                ResizeIntegerArray
+                0x80007298                InitInOutArray
+                0x800078ee                InitNvramStringArray
+                0x80008198                Abs
+                0x8000833e                SDivide
+                0x80006494                ReadIntegerArray
+                0x80004454                CompareStrings
+                0x80009812                LowerChar
+                0x80009aea                InitUdpSocket
+                0x80008558                ClearBuffer
+                0x800089a6                Upper
+                0x8000798a                InitStructArray
+                0x80008a7c                MakeLower
+                0x80008b5c                IsVolume
+                0x80005ee6                RemoveByLength
+                0x80007bda                CheckStringOutputArrayIndex
+                0x80008d86                WriteLongIntegerArray
+                0x8000960e                InitRampInfoStructArray
+                0x80007e20                HighWord
+                0x8000471c                ResizeString
+                0x80008b02                IsDirectory
+                0x800066b4                ReadLongIntegerArray
+                0x80007e12                Low
+                0x800058c0                Gather
+                0x80008aaa                MakeUpper
+                0x80007510                InitStringStruct
+                0x800094fa                CheckStringArrayBounds
+                0x80008240                CheckDenominator
+                0x80009716                hextoi
+                0x80006e38                WriteStringArray
+                0x80007d02                SetByte
+                0x800095b8                InitializeRampInfo
+                0x80009954                UnLockInputSema
+                0x80008c7c                WriteSignedLongInteger
+                0x80007602                InitNvramStringStruct
+ *fill*         0x80009b7a        0x6
+                0x80009b80                .=ALIGN(0x10)
+ *(.eh_frame)
+                0x80009b80                .=ALIGN(0x10)
+ *(.gnu.linkonce.t.*)
+                0x80009b80                .=ALIGN(0x4)
+                0x80009b80                __CTOR_LIST__=.
+                0x80009b80                ___CTOR_LIST__=.
+                0x80009b80        0x4 LONG 0x0 (((__CTOR_END__-__CTOR_LIST__)/0x4)-0x2)
+ *(.ctors)
+                0x80009b84        0x4 LONG 0x0
+                0x80009b88                __CTOR_END__=.
+                0x80009b88                __DTOR_LIST__=.
+                0x80009b88                ___DTOR_LIST__=.
+                0x80009b88        0x4 LONG 0x0 (((__DTOR_END__-__DTOR_LIST__)/0x4)-0x2)
+ *(.dtors)
+                0x80009b8c        0x4 LONG 0x0
+                0x80009b90                __DTOR_END__=.
+ *(.rodata)
+ .rodata        0x80009b90      0x2d9 S2_Honeywell_Vista_128FBP_250FBP_128BPE_250BPE_Event_Log_Driver_v4_1.o
+ .rodata        0x80009e69      0x3cb S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1.o
+ .rodata        0x8000a234      0x39b S2_Honeywell_Vista_128FBP_250FBP_Keypad_Partition_v4_1.o
+ .rodata        0x8000a5cf      0xc54 library.o
+ *(.gcc_except_table)
+ *fill*         0x8000b223        0x1
+                0x8000b224                .=ALIGN(0x2)
+                0x8000b224                __INIT_SECTION__=.
+                0x8000b224        0x4 LONG 0x4e560000
+ *(.init)
+                0x8000b228        0x2 SHORT 0x4e5e
+                0x8000b22a        0x2 SHORT 0x4e75
+                0x8000b22c                __FINI_SECTION__=.
+                0x8000b22c        0x4 LONG 0x4e560000
+ *(.fini)
+                0x8000b230        0x2 SHORT 0x4e5e
+                0x8000b232        0x2 SHORT 0x4e75
+ *(.lit)
+ *fill*         0x8000b234        0xc
+                0x8000b240                .=ALIGN(0x10)
+                0x8000b240                _etext=.
+                0x8000b240                etext=.
+
+.data           0x8000b240        0x0
+                0x8000b240                copy_start=.
+ *(.shdata)
+ *(.data)
+ *(.gnu.linkonce.d.*)
+                0x8000b240                .=ALIGN(0x10)
+                0x8000b240                _edata=.
+                0x8000b240                copy_end=.
+
+.got
+ *(.got.plt)
+ *(.got)
+
+EntryList       0x8000b240      0x330
+ *(EntryList)
+ EntryList      0x8000b240      0x110 S2_Honeywell_Vista_128FBP_250FBP_128BPE_250BPE_Event_Log_Driver_v4_1.o
+                0x8000b240                S2_Honeywell_Vista_128FBP_250FBP_128BPE_250BPE_Event_Log_Driver_v4_1_Entry
+ EntryList      0x8000b350      0x110 S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1.o
+                0x8000b350                S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1_Entry
+ EntryList      0x8000b460      0x110 S2_Honeywell_Vista_128FBP_250FBP_Keypad_Partition_v4_1.o
+                0x8000b460                S2_Honeywell_Vista_128FBP_250FBP_Keypad_Partition_v4_1_Entry
+                0x8000b570                .=ALIGN(0x4)
+
+FunctionList    0x8000b570        0x4
+ *(FunctionList)
+ FunctionList   0x8000b570        0x4 globals.o
+                0x8000b570                g_pFunctions
+                0x8000b574                .=ALIGN(0x4)
+
+.bss            0x8000b574        0x0
+                0x8000b574                .=ALIGN(0x4)
+                0x8000b574                __bss_start=.
+ *(.shbss)
+ *(.bss)
+ *(COMMON)
+                0x8000b578                _end=ALIGN(0x8)
+                0x8000b578                __end=_end
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges
+ *(.debug_aranges)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info
+ *(.debug_info)
+
+.debug_abbrev
+ *(.debug_abbrev)
+
+.debug_line
+ *(.debug_line)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str
+ *(.debug_str)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+LOAD S2_Honeywell_Vista_128FBP_250FBP_128BPE_250BPE_Event_Log_Driver_v4_1.o
+LOAD S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1.o
+LOAD S2_Honeywell_Vista_128FBP_250FBP_Keypad_Partition_v4_1.o
+LOAD globals.o
+LOAD library.o
+OUTPUT(_S2_2021_2_9_Hill_HI_Alarm.spl elf32-m68k)
+
+.comment        0x8000b574       0xbe
+ .comment       0x8000b574       0x26 S2_Honeywell_Vista_128FBP_250FBP_128BPE_250BPE_Event_Log_Driver_v4_1.o
+ .comment       0x8000b59a       0x26 S2_Honeywell_Vista_128FBP___250FBP_Queue_v4_1.o
+ .comment       0x8000b5c0       0x26 S2_Honeywell_Vista_128FBP_250FBP_Keypad_Partition_v4_1.o
+ .comment       0x8000b5e6       0x26 globals.o
+ .comment       0x8000b60c       0x26 library.o
